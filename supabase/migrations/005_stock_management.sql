@@ -232,7 +232,7 @@ ALTER TABLE stock_movements ENABLE ROW LEVEL SECURITY;
 -- RLS Policies for stock_movements
 CREATE POLICY "Admin full access to stock_movements" ON stock_movements
 FOR ALL USING (
-  auth.is_admin()
+  public.is_admin()
 );
 
 CREATE POLICY "Public read access to stock_movements" ON stock_movements

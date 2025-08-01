@@ -1,6 +1,10 @@
 -- Additional RPC functions for frontend operations
 
 -- Function to get products with their set relationships
+DROP FUNCTION IF EXISTS get_products_with_sets() CASCADE;
+DROP FUNCTION IF EXISTS get_order_with_items(UUID);
+DROP FUNCTION IF EXISTS get_inventory_report();
+
 CREATE OR REPLACE FUNCTION get_products_with_sets()
 RETURNS TABLE (
   id UUID,
@@ -309,7 +313,7 @@ RETURNS TABLE (
   id UUID,
   type TEXT,
   content JSONB,
-  position JSONB,
+  position_data JSONB,
   page_path TEXT,
   is_active BOOLEAN,
   display_order INTEGER,

@@ -2,6 +2,16 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
+CREATE TYPE layout_type AS ENUM (
+  'SINGLE_COLUMN',
+  'SPLIT_SMALL_LEFT',
+  'SPLIT_SMALL_RIGHT',
+  'STAGGERED_THREE',
+  'TWO_HORIZONTAL'
+);
+CREATE TYPE order_status AS ENUM ('pending', 'processing', 'shipped', 'delivered', 'cancelled');
+CREATE TYPE payment_status AS ENUM ('pending', 'paid', 'failed', 'refunded');
+
 -- Admin users table (connected to auth.users)
 CREATE TABLE admin_users (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
