@@ -1,0 +1,42 @@
+'use client';
+
+import { createClient } from "@/lib/supabase/client";
+import { updateSetFormSchema } from '@/lib/schemas/setSchema';
+import type { ActionResponse } from '@/types/actions';
+import type { SetRow } from '@/types/db';
+
+export async function updateSetAction(setId: string, prevState: ActionResponse<SetRow> | null, formData: FormData): Promise<ActionResponse<SetRow>> {
+    const supabase = createClient();
+    
+    try {
+        const rawData = {
+            name: formData.get('name') as string,
+            slug: formData.get('slug') as string,
+            type: formData.get('type') as string,
+            description: formData.get('description') as string,
+            layout_type: formData.get('layout_type') as string,
+            is_active: formData.get('is_active') === 'true',
+        };
+
+        const validationResult = updateSetFormSchema.safeParse(rawData);
+        if (!validationResult.success) {
+            return { success: false, error: 'Validation failed' };
+        }
+
+        const { data, error } = await supabase
+            .from('sets')
+            .update(validationResult.data)
+            .eq('id', setId)
+            .select()
+            .single();
+
+        if (error) {
+            return { success: false, error: `Failed to update set: ${error.message}` };
+        }
+
+        return { success: true, data };
+    } catch (err) {
+        const message = err instanceof Error ? err.message : "Unknown error";
+        return { success: false, error: message };
+    }
+} 
