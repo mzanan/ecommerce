@@ -4,6 +4,8 @@
 DROP FUNCTION IF EXISTS get_products_with_sets() CASCADE;
 DROP FUNCTION IF EXISTS get_order_with_items(UUID);
 DROP FUNCTION IF EXISTS get_inventory_report();
+DROP FUNCTION IF EXISTS get_sets_with_products();
+DROP FUNCTION IF EXISTS get_sets_complete();
 
 CREATE OR REPLACE FUNCTION get_products_with_sets()
 RETURNS TABLE (

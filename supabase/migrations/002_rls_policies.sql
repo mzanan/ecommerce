@@ -174,3 +174,24 @@ CREATE POLICY "Public can view country_shipping_prices" ON country_shipping_pric
 
 CREATE POLICY "Admins can manage country_shipping_prices" ON country_shipping_prices
   FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin()); 
+
+-- Only admins can upload files
+CREATE POLICY "Admins can upload files"
+ON storage.objects
+FOR INSERT
+TO authenticated
+WITH CHECK (public.is_admin());
+
+-- Only admins can view files
+CREATE POLICY "Admins can view files"
+ON storage.objects
+FOR SELECT
+TO authenticated
+USING (public.is_admin());
+
+-- Only admins can delete files
+CREATE POLICY "Admins can delete files"
+ON storage.objects
+FOR DELETE
+TO authenticated
+USING (public.is_admin());
