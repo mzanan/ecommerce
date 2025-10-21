@@ -3,11 +3,6 @@ import { v4 as uuidv4 } from 'uuid';
 
 const BUCKET_NAME = process.env.SUPABASE_BUCKET || 'infideli-images';
 
-/**
- * Uploads a product image file to Supabase Storage.
- * @param file The image file to upload.
- * @returns Object containing publicUrl, path (for deletion), and error.
- */
 export async function uploadProductImage(file: File): Promise<{ publicUrl: string | null, path: string | null, error: string | null }> {
     const supabase = createServerActionClient();
     const fileExtension = file.name.split('.').pop();
@@ -40,11 +35,6 @@ export async function uploadProductImage(file: File): Promise<{ publicUrl: strin
     }
 }
 
-/**
- * Deletes a product image from Supabase Storage using its full public URL.
- * @param imageUrl The full public URL of the image to delete.
- * @returns Object containing success status and error message.
- */
 export async function deleteProductImage(imageUrl: string): Promise<{ success: boolean, error: string | null }> {
     const supabase = createServerActionClient();
     const bucketName = process.env.NEXT_PUBLIC_SUPABASE_BUCKET_NAME || 'infideli-images';
@@ -80,13 +70,6 @@ export async function deleteProductImage(imageUrl: string): Promise<{ success: b
     }
 }
 
-
-
-/**
- * Uploads a set image file to Supabase Storage.
- * @param file The image file to upload.
- * @returns Object containing publicUrl, path (for deletion), and error.
- */
 export async function uploadCollectionImage(file: File): Promise<{ publicUrl: string | null, path: string | null, error: string | null }> {
     const supabase = createServerActionClient();
     const fileExtension = file.name.split('.').pop();
@@ -123,11 +106,6 @@ export async function uploadCollectionImage(file: File): Promise<{ publicUrl: st
     }
 }
 
-/**
- * Deletes a set image from Supabase Storage using its storage path.
- * @param imagePath The storage path of the image (e.g., 'sets/image.jpg').
- * @returns Object containing success status and error message.
- */
 export async function deleteCollectionImage(imagePath: string): Promise<{ success: boolean, error: string | null }> {
     const supabase = createServerActionClient();
     
@@ -155,12 +133,6 @@ export async function deleteCollectionImage(imagePath: string): Promise<{ succes
     }
 }
 
-
-/**
- * Uploads an about image file to Supabase Storage.
- * @param file The image file to upload.
- * @returns Object containing publicUrl, path (for deletion), and error.
- */
 export async function uploadAboutImage(file: File): Promise<{ publicUrl: string | null, path: string | null, error: string | null }> {
     const supabase = createServerActionClient();
     const fileExtension = file.name.split('.').pop();
@@ -193,11 +165,6 @@ export async function uploadAboutImage(file: File): Promise<{ publicUrl: string 
     }
 }
 
-/**
- * Deletes a file from Supabase Storage using its storage path.
- * @param filePath The storage path of the file (e.g., 'about/image.jpg').
- * @returns Object containing success status and error message.
- */
 export async function deleteFileByPath(filePath: string): Promise<{ success: boolean, error: string | null }> {
     const supabase = createServerActionClient();
     
@@ -225,12 +192,6 @@ export async function deleteFileByPath(filePath: string): Promise<{ success: boo
     }
 }
 
-/**
- * Extracts the storage path from a public URL.
- * @param publicUrl The full public URL of the file.
- * @param bucketName The bucket name.
- * @returns The storage path or null if extraction fails.
- */
 export function getStoragePathFromUrl(publicUrl: string, bucketName: string): string | null {
     try {
         const url = new URL(publicUrl);
@@ -247,5 +208,64 @@ export function getStoragePathFromUrl(publicUrl: string, bucketName: string): st
     } catch (error) {
         console.error(`[Storage Helper Error] Invalid URL: ${publicUrl}`, error);
         return null;
+    }
+}
+
+export async function uploadHeroImage(file: File): Promise<{ publicUrl: string | null, path: string | null, error: string | null }> {
+    const supabase = createServerActionClient();
+    const fileExtension = file.name.split('.').pop();
+    const uniqueFileName = `${uuidv4()}.${fileExtension}`;
+    const filePath = `hero/${uniqueFileName}`;
+
+    try {
+        const { data: uploadData, error: uploadError } = await supabase.storage
+            .from(BUCKET_NAME)
+            .upload(filePath, file, {
+                cacheControl: '3600',
+                upsert: false,
+            });
+
+        if (uploadError) {
+            console.error('[HERO STORAGE] Upload error:', uploadError.message, uploadError);
+            return { publicUrl: null, path: null, error: `Storage upload failed: ${uploadError.message}` };
+        }
+
+        const { data: urlData } = supabase.storage
+            .from(BUCKET_NAME)
+            .getPublicUrl(uploadData.path);
+        
+        return { publicUrl: urlData.publicUrl, path: uploadData.path, error: null };
+
+    } catch (error) {
+        const typedError = error instanceof Error ? error : new Error('Unknown storage error');
+        console.error('[HERO STORAGE] Unexpected error:', typedError.message, typedError);
+        return { publicUrl: null, path: null, error: `Unexpected storage error: ${typedError.message}` };
+    }
+}
+
+export async function deleteHeroImage(imagePath: string): Promise<{ success: boolean, error: string | null }> {
+    const supabase = createServerActionClient();
+    
+    if (!imagePath) {
+         console.warn('[Storage Helper Warn] deleteHeroImage called with empty path.');
+        return { success: false, error: 'Image path cannot be empty.' };
+    }
+
+    try {
+        const { error: deleteError } = await supabase.storage
+            .from(BUCKET_NAME)
+            .remove([imagePath]);
+
+        if (deleteError) {
+            console.error(`[Storage Helper Error] Delete Hero Image (${imagePath}):`, deleteError.message);
+            return { success: false, error: `Failed to delete image from storage: ${deleteError.message}` };
+        }
+        
+        return { success: true, error: null };
+
+    } catch (error) {
+         const typedError = error instanceof Error ? error : new Error('Unknown error during image deletion');
+        console.error(`[Storage Helper Error] Unexpected Delete Hero Image (${imagePath}):`, typedError.message);
+        return { success: false, error: `Failed to delete hero image due to storage error: ${typedError.message}` };
     }
 } 

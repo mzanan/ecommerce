@@ -1,13 +1,18 @@
-import { useEffect, useRef, useMemo } from 'react';
+import React from 'react';
+import { useMemo, useCallback, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEntityForm, type InitialImage } from '@/components/admin/layout/EntityFormLayout/useEntityForm';
 import { heroContentFormSchema, type HeroContentFormData, HERO_CONTENT_ID } from '@/lib/schemas/heroSchema';
 import { useHeroContent } from '@/lib/queries/heroQueries';
 import { wrappedUpsertHeroContentAction } from '@/lib/helpers/heroHelpers';
+import { deleteHeroImageAction } from '@/lib/actions/deleteHeroImageAction';
+import { toast } from 'sonner';
 import type { HeroDbRow } from '@/types/hero';
 
 export function useHeroSettings(initialDataFromProps: HeroDbRow | null) {
   const queryClient = useQueryClient();
+  const [isDeleting, setIsDeleting] = useState(false);
+  
   const {
     data: heroDataFromQuery,
     error: heroError,
@@ -54,38 +59,99 @@ export function useHeroSettings(initialDataFromProps: HeroDbRow | null) {
     register,
     handleSubmit,
     onSubmit,
-    isPending, 
     state: formActionState, 
-    displayImages, 
-    imageIds, 
     sensors, 
     handleDragEnd, 
-    handleImageChange, 
-    handleMarkDelete, 
-    handleRemoveStaged,
     fileInputRef,
   } = formHookResult;
 
-  const submittedFileRef = useRef<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
-  useEffect(() => {
-    if (formActionState?.success) {
-      queryClient.invalidateQueries({ queryKey: ['heroContent', HERO_CONTENT_ID] });
-    }
-  }, [formActionState, queryClient]);
-
-  useEffect(() => {
-    if (isPending || !displayImages || displayImages.length !== 1) {
+  const handleHeroImageUpload = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) {
+      console.log('[HERO UI] No files selected');
       return;
     }
 
-    const currentImage = displayImages[0];
+    const file = files[0];
 
-    if (currentImage.file && currentImage.file !== submittedFileRef.current) {
-      handleSubmit(onSubmit)();
-      submittedFileRef.current = currentImage.file;
+    setIsUploading(true);
+
+    const formData = new FormData();
+    formData.append('id', String(HERO_CONTENT_ID));
+    formData.append('images', file, file.name);
+    if (currentHeroData?.image_url) {
+      formData.append('current_image_url', currentHeroData.image_url);
     }
-  }, [displayImages, handleSubmit, onSubmit, isPending]);
+
+    try {
+      const result = await wrappedUpsertHeroContentAction(null, formData);
+
+      if (result.success) {
+        toast.success(result.message || 'Hero image uploaded');
+        queryClient.invalidateQueries({ queryKey: ['heroContent', HERO_CONTENT_ID] });
+      } else {
+        toast.error(result.error || result.message || 'Failed to upload image');
+      }
+    } catch (error) {
+      console.error('[HERO UI] Upload error:', error);
+      toast.error('Failed to upload image');
+    } finally {
+      setIsUploading(false);
+      if (event.target) event.target.value = '';
+    }
+  }, [currentHeroData, queryClient]);
+
+  const handleDeleteHeroImage = useCallback(async () => {
+    console.log('[HERO UI] Delete button clicked');
+    setIsDeleting(true);
+    
+    try {
+      const result = await deleteHeroImageAction();
+      
+      if (result.success) {
+        toast.success(result.message || 'Hero image deleted');
+        await queryClient.invalidateQueries({ queryKey: ['heroContent', HERO_CONTENT_ID] });
+        await queryClient.refetchQueries({ queryKey: ['heroContent', HERO_CONTENT_ID] });
+      } else {
+        toast.error(result.error || 'Failed to delete image');
+      }
+    } catch (error) {
+      console.error('[HERO UI] Delete error:', error);
+      toast.error('Failed to delete image');
+    } finally {
+      setIsDeleting(false);
+    }
+  }, [queryClient]);
+
+  const displayImages = useMemo(() => {
+    if (isUploading) {
+      return [{
+        id: 'uploading',
+        url: '',
+        isExisting: false,
+        isMarkedForDelete: false,
+      }];
+    }
+    
+    if (isDeleting) {
+      return [];
+    }
+    
+    const imageUrl = heroDataFromQuery?.image_url ?? initialDataFromProps?.image_url;
+    
+    return imageUrl
+      ? [{
+          id: `hero-image-${HERO_CONTENT_ID}`,
+          url: imageUrl,
+          isExisting: true,
+          isMarkedForDelete: false,
+        }]
+      : [];
+  }, [heroDataFromQuery?.image_url, initialDataFromProps?.image_url, isUploading, isDeleting]);
+
+  const imageIds = useMemo(() => displayImages.map(img => img.id), [displayImages]);
 
   return {
     formHookResult,
@@ -93,16 +159,18 @@ export function useHeroSettings(initialDataFromProps: HeroDbRow | null) {
     register,
     handleSubmit,
     onSubmit,
-    isPending,
+    isPending: isUploading || isDeleting,
     formActionState,
     displayImages,
     imageIds,
     sensors,
     handleDragEnd,
-    handleImageChange,
-    handleMarkDelete,
-    handleRemoveStaged,
+    handleImageChange: handleHeroImageUpload,
+    handleMarkDelete: handleDeleteHeroImage,
+    handleRemoveStaged: handleDeleteHeroImage,
     fileInputRef,
-    heroError
+    heroError,
+    isDeleting,
+    isUploading
   };
 } 

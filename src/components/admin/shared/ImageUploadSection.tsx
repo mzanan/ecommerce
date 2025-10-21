@@ -102,13 +102,20 @@ export function ImageUploadSection({
                    )}
                 </div>
                 
-                {imagesToRender.length === 0 && (
+                {isPending && imagesToRender.length > 0 && imagesToRender[0].id === 'uploading' && (
+                    <div className="flex flex-col items-center justify-center gap-4 p-8 border-2 border-dashed rounded-lg">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                        <p className="text-sm text-muted-foreground font-medium">Uploading image...</p>
+                    </div>
+                )}
+                
+                {!isPending && imagesToRender.length === 0 && maxImages !== 1 && (
                     <p className="text-sm text-destructive mt-2">
                         Images are required.
                     </p>
                 )}
 
-                {hasMounted && imagesToRender.length > 0 && (
+                {hasMounted && imagesToRender.length > 0 && imagesToRender[0].id !== 'uploading' && (
                     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                        <SortableContext items={imageIdsToRender} strategy={rectSortingStrategy}>
                            <div className={`flex gap-4 ${aspectRatio === 'video' ? 'flex-col' : 'flex-wrap'}`}>

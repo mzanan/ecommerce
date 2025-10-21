@@ -9,12 +9,14 @@ export const heroContentFormSchema = z.object({
     }),
   images: z.any()
     .refine((files) => {
+        if (!files) return true;
         if (files instanceof File && files.size > 0) return true;
         if (Array.isArray(files) && files.length > 0 && files[0] instanceof File && files[0].size > 0) return true;
         if (typeof FileList !== 'undefined' && files instanceof FileList && files.length > 0 && files[0]?.size > 0) return true;
-        return false;
-    }, 'An image is required.')
+        return true;
+    }, 'Invalid image file.')
     .refine((files) => {
+        if (!files) return true;
         const fileArray = Array.isArray(files) && files.every(f => f instanceof File) 
                             ? files 
                             : (typeof FileList !== 'undefined' && files instanceof FileList) 
@@ -24,6 +26,7 @@ export const heroContentFormSchema = z.object({
         return fileArray.every(file => file.size <= 5 * 1024 * 1024); 
     }, `Each image must be 5MB or less.`)
     .refine((files) => {
+        if (!files) return true;
         const fileArray = Array.isArray(files) && files.every(f => f instanceof File) 
                             ? files 
                             : (typeof FileList !== 'undefined' && files instanceof FileList) 

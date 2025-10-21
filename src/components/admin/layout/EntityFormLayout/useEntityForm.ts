@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef, startTransition } from 'react';
-import { useForm, type UseFormReturn, type Resolver, type FieldValues, type Path, type PathValue, type DefaultValues } from 'react-hook-form';
+import { useForm, type UseFormReturn, type FieldValues, type Path, type PathValue, type DefaultValues } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
@@ -16,7 +16,6 @@ import {
 import { sortableKeyboardCoordinates, arrayMove } from '@dnd-kit/sortable';
 import type { DragEndEvent } from '@dnd-kit/core';
 import { v4 as uuidv4 } from 'uuid';
-import type { ZodSchema } from 'zod';
 import type { ActionResponse } from '@/types/actions';
 import * as z from 'zod';
 
@@ -54,7 +53,7 @@ interface UseEntityFormProps<
     TResponseData = any,
     TInitialData extends BaseInitialEntityData = BaseInitialEntityData
 > {
-    schema: ZodSchema<TFormData>;
+    schema: z.ZodType<TFormData, any, any>;
     serverAction: EntityServerAction<TResponseData>;
     initialData?: TInitialData | null;
     initialImages?: InitialImage[] | null;
@@ -112,9 +111,9 @@ export function useEntityForm<
     let formDefaultValues: DefaultValues<TFormData>;
 
     if (isUpdate && initialData) {
-        const typeDefaultFromSchema = schema instanceof z.ZodObject && (schema.shape as any).type?._def?.defaultValue ? (schema.shape as any).type._def.defaultValue() : undefined;
-        const layoutTypeDefaultFromSchema = schema instanceof z.ZodObject && (schema.shape as any).layout_type?._def?.defaultValue ? (schema.shape as any).layout_type._def.defaultValue() : undefined;
-        const isActiveDefaultFromSchema = schema instanceof z.ZodObject && (schema.shape as any).is_active?._def?.defaultValue ? (schema.shape as any).is_active._def.defaultValue() : true;
+        const typeDefaultFromSchema = schema instanceof z.ZodObject && (schema.shape as any).type?._def?.defaultValue !== undefined ? (schema.shape as any).type._def.defaultValue : undefined;
+        const layoutTypeDefaultFromSchema = schema instanceof z.ZodObject && (schema.shape as any).layout_type?._def?.defaultValue !== undefined ? (schema.shape as any).layout_type._def.defaultValue : undefined;
+        const isActiveDefaultFromSchema = schema instanceof z.ZodObject && (schema.shape as any).is_active?._def?.defaultValue !== undefined ? (schema.shape as any).is_active._def.defaultValue : true;
 
         formDefaultValues = {
             ...(initialData as any),
@@ -124,13 +123,13 @@ export function useEntityForm<
             images: initialData.images ?? [],
         } as unknown as DefaultValues<TFormData>;
     } else {
-        const typeDefaultFromSchema = schema instanceof z.ZodObject && (schema.shape as any).type?._def?.defaultValue ? (schema.shape as any).type._def.defaultValue() : undefined;
-        const layoutTypeDefaultFromSchema = schema instanceof z.ZodObject && (schema.shape as any).layout_type?._def?.defaultValue ? (schema.shape as any).layout_type._def.defaultValue() : undefined;
-        const isActiveDefaultFromSchema = schema instanceof z.ZodObject && (schema.shape as any).is_active?._def?.defaultValue ? (schema.shape as any).is_active._def.defaultValue() : true;
+        const typeDefaultFromSchema = schema instanceof z.ZodObject && (schema.shape as any).type?._def?.defaultValue !== undefined ? (schema.shape as any).type._def.defaultValue : undefined;
+        const layoutTypeDefaultFromSchema = schema instanceof z.ZodObject && (schema.shape as any).layout_type?._def?.defaultValue !== undefined ? (schema.shape as any).layout_type._def.defaultValue : undefined;
+        const isActiveDefaultFromSchema = schema instanceof z.ZodObject && (schema.shape as any).is_active?._def?.defaultValue !== undefined ? (schema.shape as any).is_active._def.defaultValue : true;
 
-        const defaultName = schema instanceof z.ZodObject && (schema.shape as any).name?._def?.defaultValue?.() ? (schema.shape as any).name._def.defaultValue() : '';
-        const defaultImages = schema instanceof z.ZodObject && (schema.shape as any).images?._def?.defaultValue?.() ? (schema.shape as any).images._def.defaultValue() : [];
-        const defaultDescription = schema instanceof z.ZodObject && (schema.shape as any).description?._def?.defaultValue?.() ? (schema.shape as any).description._def.defaultValue() : '';
+        const defaultName = schema instanceof z.ZodObject && (schema.shape as any).name?._def?.defaultValue !== undefined ? (schema.shape as any).name._def.defaultValue : '';
+        const defaultImages = schema instanceof z.ZodObject && (schema.shape as any).images?._def?.defaultValue !== undefined ? (schema.shape as any).images._def.defaultValue : [];
+        const defaultDescription = schema instanceof z.ZodObject && (schema.shape as any).description?._def?.defaultValue !== undefined ? (schema.shape as any).description._def.defaultValue : '';
 
         formDefaultValues = {
             name: defaultName,
@@ -144,7 +143,7 @@ export function useEntityForm<
     }
 
     const formMethods = useForm<TFormData>({
-        resolver: zodResolver(schema) as Resolver<TFormData>,
+        resolver: zodResolver(schema),
         defaultValues: formDefaultValues,
         mode: 'onChange',
     });
@@ -265,7 +264,9 @@ export function useEntityForm<
 
     const handleImageChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
         const files = event.target.files;
+        
         if (!files || files.length === 0) {
+            console.log('[ENTITY FORM] No files selected, returning');
             return;
         }
 
@@ -304,6 +305,7 @@ export function useEntityForm<
 
             if (newFormFiles.length > 0) {
                 const currentFormFiles = formMethods.getValues('images' as Path<TFormData>) as File[] || [];
+
                 formMethods.setValue(
                     'images' as Path<TFormData>, 
                     [...currentFormFiles, ...newFormFiles] as PathValue<TFormData, Path<TFormData>>, 
@@ -313,21 +315,25 @@ export function useEntityForm<
 
             if (event.target) event.target.value = '';
             
-            return [...currentImages, ...newDisplayItems];
+            const newImages = [...currentImages, ...newDisplayItems];
+            return newImages;
         });
     }, [maxImages, formMethods]);
 
     const handleRemoveStaged = useCallback((idToRemove: string) => {
         
         let removedFile: File | undefined;
-        setDisplayImages(prev => prev.filter(item => {
-            if (item.id === idToRemove && !item.isExisting) { 
-                if (item.url.startsWith('blob:')) URL.revokeObjectURL(item.url);
-                removedFile = item.file;
-                return false; 
-            }
-            return true;
-        }));
+        setDisplayImages(prev => {
+            const filtered = prev.filter(item => {
+                if (item.id === idToRemove && !item.isExisting) { 
+                    if (item.url.startsWith('blob:')) URL.revokeObjectURL(item.url);
+                    removedFile = item.file;
+                    return false; 
+                }
+                return true;
+            });
+            return filtered;
+        });
 
         if (removedFile) {
             const currentFormFiles = (formMethods.getValues('images' as Path<TFormData>) as File[]) || [];
@@ -337,11 +343,14 @@ export function useEntityForm<
     }, [formMethods]);
 
         const handleMarkDelete = useCallback((idToMark: string) => {
-        setDisplayImages(prev => prev.map(item => 
-            item.id === idToMark 
-                ? { ...item, isMarkedForDelete: true }
-                : item
-        ));
+        setDisplayImages(prev => {
+            const updated = prev.map(item => 
+                item.id === idToMark 
+                    ? { ...item, isMarkedForDelete: true }
+                    : item
+            );
+            return updated;
+        });
 
         setDeleteImageIds(prev => {
             if (!prev.includes(idToMark)) {
