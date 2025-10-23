@@ -13,7 +13,6 @@ RETURNS TABLE (
   name VARCHAR(255),
   description TEXT,
   price DECIMAL(10,2),
-  images JSONB,
   category_name VARCHAR(255),
   is_in_sets BOOLEAN,
   set_count INTEGER
@@ -25,15 +24,14 @@ BEGIN
     p.name,
     p.description,
     p.price,
-    p.images,
     c.name as category_name,
     (COUNT(sp.set_id) > 0) as is_in_sets,
     COUNT(sp.set_id)::INTEGER as set_count
   FROM products p
-  LEFT JOIN categories c ON p.category_id = c.id
+  LEFT JOIN product_categories c ON p.category_id = c.id
   LEFT JOIN set_products sp ON p.id = sp.product_id
   WHERE p.is_active = true
-  GROUP BY p.id, p.name, p.description, p.price, p.images, c.name
+  GROUP BY p.id, p.name, p.description, p.price, c.name
   ORDER BY p.created_at DESC;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -48,8 +46,6 @@ RETURNS TABLE (
   final_price DECIMAL(10,2),
   discount_percentage DECIMAL(5,2),
   layout layout_type,
-  images JSONB,
-  category_name VARCHAR(255),
   product_count INTEGER,
   products JSONB
 ) AS $$
@@ -62,9 +58,7 @@ BEGIN
     s.total_price,
     s.final_price,
     s.discount_percentage,
-    s.layout,
-    s.images,
-    c.name as category_name,
+    s.layout_type,
     COUNT(sp.product_id)::INTEGER as product_count,
     COALESCE(
       json_agg(
@@ -72,21 +66,19 @@ BEGIN
           'id', p.id,
           'name', p.name,
           'price', p.price,
-          'images', p.images,
           'quantity', sp.quantity,
-          'display_order', sp.display_order
-        ) ORDER BY sp.display_order
+          'position', sp.position
+        ) ORDER BY sp.position
       ) FILTER (WHERE p.id IS NOT NULL),
       '[]'::json
     )::jsonb as products
   FROM sets s
-  LEFT JOIN categories c ON s.category_id = c.id
   LEFT JOIN set_products sp ON s.id = sp.set_id
   LEFT JOIN products p ON sp.product_id = p.id AND p.is_active = true
   WHERE s.is_active = true
   GROUP BY s.id, s.name, s.description, s.total_price, s.final_price, 
-           s.discount_percentage, s.layout, s.images, c.name
-  ORDER BY s.sort_order, s.created_at DESC;
+           s.discount_percentage, s.layout_type
+  ORDER BY s.created_at DESC;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
@@ -94,18 +86,17 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE OR REPLACE FUNCTION get_order_with_items(order_id UUID)
 RETURNS TABLE (
   id UUID,
-  order_number VARCHAR(50),
-  customer_name VARCHAR(255),
-  customer_email VARCHAR(255),
-  billing_address JSONB,
-  shipping_address JSONB,
-  subtotal DECIMAL(10,2),
-  shipping_cost DECIMAL(10,2),
-  tax_amount DECIMAL(10,2),
-  total_amount DECIMAL(10,2),
-  status order_status,
-  payment_status payment_status,
-  tracking_number VARCHAR(255),
+  shipping_name TEXT,
+  shipping_email TEXT,
+  shipping_address1 TEXT,
+  shipping_address2 TEXT,
+  shipping_city TEXT,
+  shipping_state TEXT,
+  shipping_postal_code TEXT,
+  shipping_country TEXT,
+  total_amount NUMERIC,
+  status TEXT,
+  shipping_status TEXT,
   items JSONB,
   created_at TIMESTAMP WITH TIME ZONE
 ) AS $$
@@ -113,29 +104,26 @@ BEGIN
   RETURN QUERY
   SELECT 
     o.id,
-    o.order_number,
-    o.customer_name,
-    o.customer_email,
-    o.billing_address,
-    o.shipping_address,
-    o.subtotal,
-    o.shipping_cost,
-    o.tax_amount,
+    o.shipping_name,
+    o.shipping_email,
+    o.shipping_address1,
+    o.shipping_address2,
+    o.shipping_city,
+    o.shipping_state,
+    o.shipping_postal_code,
+    o.shipping_country,
     o.total_amount,
     o.status,
-    o.payment_status,
-    o.tracking_number,
+    o.shipping_status,
     COALESCE(
       json_agg(
         json_build_object(
           'id', oi.id,
           'product_name', oi.product_name,
+          'product_size', oi.product_size,
           'quantity', oi.quantity,
-          'unit_price', oi.unit_price,
-          'total_price', oi.total_price,
-          'selected_size', oi.selected_size,
-          'selected_color', oi.selected_color,
-          'product_image_url', oi.product_image_url
+          'price_at_purchase', oi.price_at_purchase,
+          'total_price', oi.quantity * oi.price_at_purchase
         )
       ) FILTER (WHERE oi.id IS NOT NULL),
       '[]'::json
@@ -144,19 +132,18 @@ BEGIN
   FROM orders o
   LEFT JOIN order_items oi ON o.id = oi.order_id
   WHERE o.id = order_id
-  GROUP BY o.id, o.order_number, o.customer_name, o.customer_email,
-           o.billing_address, o.shipping_address, o.subtotal, o.shipping_cost,
-           o.tax_amount, o.total_amount, o.status, o.payment_status,
-           o.tracking_number, o.created_at;
+  GROUP BY o.id, o.shipping_name, o.shipping_email, o.shipping_address1,
+           o.shipping_address2, o.shipping_city, o.shipping_state,
+           o.shipping_postal_code, o.shipping_country, o.total_amount,
+           o.status, o.shipping_status, o.created_at;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Function to update order status (for admin)
 CREATE OR REPLACE FUNCTION update_order_status(
-  order_id UUID,
-  new_status order_status,
-  tracking_number_param VARCHAR(255) DEFAULT NULL,
-  shipping_carrier_param VARCHAR(100) DEFAULT NULL
+  order_uuid UUID,
+  new_status TEXT,
+  new_shipping_status TEXT DEFAULT NULL
 )
 RETURNS BOOLEAN AS $$
 DECLARE
@@ -165,12 +152,9 @@ BEGIN
   UPDATE orders 
   SET 
     status = new_status,
-    tracking_number = COALESCE(tracking_number_param, tracking_number),
-    shipping_carrier = COALESCE(shipping_carrier_param, shipping_carrier),
-    shipped_at = CASE WHEN new_status = 'shipped' THEN NOW() ELSE shipped_at END,
-    delivered_at = CASE WHEN new_status = 'delivered' THEN NOW() ELSE delivered_at END,
+    shipping_status = COALESCE(new_shipping_status, shipping_status),
     updated_at = NOW()
-  WHERE id = order_id;
+  WHERE id = order_uuid;
   
   GET DIAGNOSTICS updated_rows = ROW_COUNT;
   
@@ -183,7 +167,6 @@ CREATE OR REPLACE FUNCTION get_inventory_report()
 RETURNS TABLE (
   product_id UUID,
   product_name VARCHAR(255),
-  sku VARCHAR(100),
   current_stock INTEGER,
   stock_status TEXT,
   category_name VARCHAR(255),
@@ -194,7 +177,6 @@ BEGIN
   SELECT 
     p.id as product_id,
     p.name as product_name,
-    p.sku,
     p.stock_quantity as current_stock,
     CASE 
       WHEN p.stock_quantity = 0 THEN 'Out of Stock'
@@ -205,7 +187,7 @@ BEGIN
     c.name as category_name,
     p.updated_at as last_updated
   FROM products p
-  LEFT JOIN categories c ON p.category_id = c.id
+  LEFT JOIN product_categories c ON p.category_id = c.id
   WHERE p.is_active = true
   ORDER BY 
     CASE 
@@ -240,16 +222,16 @@ BEGIN
   RETURN QUERY
   SELECT 
     COALESCE(c.name, 'Uncategorized') as category_name,
-    COALESCE(SUM(oi.total_price), 0) as total_revenue,
+    COALESCE(SUM(oi.quantity * oi.price_at_purchase), 0) as total_revenue,
     COUNT(DISTINCT o.id)::INTEGER as total_orders,
     COALESCE(SUM(oi.quantity), 0)::INTEGER as total_items_sold,
     COALESCE(AVG(o.total_amount), 0) as avg_order_value
   FROM orders o
   JOIN order_items oi ON o.id = oi.order_id
-  LEFT JOIN products p ON oi.product_id = p.id
-  LEFT JOIN sets s ON oi.set_id = s.id
-  LEFT JOIN categories c ON COALESCE(p.category_id, s.category_id) = c.id
-  WHERE o.payment_status = 'paid'
+  LEFT JOIN product_variants pv ON oi.product_variant_id = pv.id
+  LEFT JOIN products p ON pv.product_id = p.id
+  LEFT JOIN product_categories c ON p.category_id = c.id
+  WHERE o.status IN ('processing', 'delivered')
     AND o.created_at::date BETWEEN filter_start_date AND filter_end_date
   GROUP BY c.name
   ORDER BY total_revenue DESC;

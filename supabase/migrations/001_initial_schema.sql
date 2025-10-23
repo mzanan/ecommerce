@@ -2,6 +2,10 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
+DROP TYPE IF EXISTS layout_type CASCADE;
+DROP TYPE IF EXISTS order_status CASCADE;
+DROP TYPE IF EXISTS payment_status CASCADE;
+
 CREATE TYPE layout_type AS ENUM (
   'SINGLE_COLUMN',
   'SPLIT_SMALL_LEFT',
@@ -95,6 +99,9 @@ CREATE TABLE sets (
   type TEXT CHECK (type = ANY (ARRAY['FIDELI'::text, 'INFIDELI'::text])),
   layout_type TEXT CHECK (layout_type = ANY (ARRAY['SINGLE_COLUMN'::text, 'SPLIT_SMALL_LEFT'::text, 'SPLIT_SMALL_RIGHT'::text, 'STAGGERED_THREE'::text, 'TWO_HORIZONTAL'::text])),
   show_title_on_home BOOLEAN DEFAULT true,
+  total_price DECIMAL(10,2) DEFAULT 0,
+  final_price DECIMAL(10,2) DEFAULT 0,
+  discount_percentage DECIMAL(5,2) DEFAULT 0,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -114,6 +121,7 @@ CREATE TABLE set_products (
   set_id UUID NOT NULL REFERENCES sets(id),
   product_id UUID NOT NULL REFERENCES products(id),
   position SMALLINT DEFAULT 0,
+  quantity INTEGER,
   PRIMARY KEY (set_id, product_id)
 );
 
