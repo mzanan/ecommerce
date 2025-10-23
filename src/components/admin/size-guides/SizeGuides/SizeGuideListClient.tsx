@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   Table,
@@ -18,6 +18,7 @@ import { DataTableActions } from '@/components/admin/data-table/DataTable/DataTa
 import { deleteSizeGuideTemplate } from "@/lib/actions/sizeGuideActions";
 import { useAdminSizeGuidesList } from '@/lib/queries/sizeGuideQueries';
 import { DEFAULT_PAGE_SIZE } from '@/config/dataGrid';
+import { useCacheStore } from '@/store/cacheStore';
 
 type SortKey = 'name' | 'created_at';
 type SortDirection = 'asc' | 'desc';
@@ -29,6 +30,17 @@ export function SizeGuideListClient() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = DEFAULT_PAGE_SIZE;
     const queryClient = useQueryClient();
+  const cache = useCacheStore();
+
+  useEffect(() => {
+    const cacheKeyPattern = 'admin-size-guides-';
+    const cacheEntries = cache.cache;
+    Object.keys(cacheEntries).forEach(key => {
+      if (key.startsWith(cacheKeyPattern)) {
+        cache.remove(key);
+      }
+    });
+  }, [cache]);
 
   const handleSort = (key: string) => {
     const sortKeyTyped = key as SortKey;
@@ -41,8 +53,15 @@ export function SizeGuideListClient() {
   };
 
     const refreshData = useCallback(() => {
+    const cacheKeyPattern = 'admin-size-guides-';
+    const cacheEntries = cache.cache;
+    Object.keys(cacheEntries).forEach(key => {
+      if (key.startsWith(cacheKeyPattern)) {
+        cache.remove(key);
+      }
+    });
         queryClient.invalidateQueries({ queryKey: ['adminSizeGuides'] });
-    }, [queryClient]);
+    }, [queryClient, cache]);
 
   const {
     data: queryResult,

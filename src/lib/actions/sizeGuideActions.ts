@@ -68,6 +68,7 @@ export async function createSizeGuideTemplate(
 
     revalidatePath('/admin/size-guides');
     revalidatePath('/admin/products');
+    revalidatePath('/admin/categories');
     return { success: true, message: 'Size guide template created successfully.' };
 }
 

@@ -40,7 +40,7 @@ export async function createProduct(
     }
 
     const { extractImageFilesFromFormData } = require('@/lib/helpers/formHelpers');
-  const imageFiles = extractImageFilesFromFormData(formData);
+    const imageFiles = extractImageFilesFromFormData(formData);
     const imageOrderJson = formData.get('imageOrder');
     const setIdsString = formData.get('setIds');
     const categoryId = formData.get('category_id') as string | null;

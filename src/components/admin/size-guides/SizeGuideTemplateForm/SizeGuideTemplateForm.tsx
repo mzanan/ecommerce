@@ -8,6 +8,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { sizeGuideTemplateFormSchema, SizeGuideTemplateFormData, SizeGuideTemplate } from '@/lib/schemas/sizeGuideTemplateSchema';
 import { createSizeGuideTemplate, updateSizeGuideTemplate } from '@/lib/actions/sizeGuideActions';
+import { useCacheStore } from '@/store/cacheStore';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -84,6 +85,7 @@ const extractGuideData = (initialData: SizeGuideTemplate | null | undefined): { 
 export default function SizeGuideTemplateForm({ initialData }: SizeGuideTemplateFormProps) {
     const router = useRouter();
     const queryClient = useQueryClient();
+    const cache = useCacheStore();
     const isUpdate = !!initialData?.id;
 
     const formAction = isUpdate 
@@ -141,6 +143,13 @@ export default function SizeGuideTemplateForm({ initialData }: SizeGuideTemplate
         if (!state) return;
         if (state.success) {
             toast.success(state.message || (isUpdate ? 'Template updated!' : 'Template created!'));
+            const cacheKeyPattern = 'admin-size-guides-';
+            const cacheEntries = cache.cache;
+            Object.keys(cacheEntries).forEach(key => {
+                if (key.startsWith(cacheKeyPattern)) {
+                    cache.remove(key);
+                }
+            });
             queryClient.invalidateQueries({ queryKey: ['adminSizeGuides'] });
             router.push('/admin/size-guides'); 
         } else {
@@ -149,7 +158,7 @@ export default function SizeGuideTemplateForm({ initialData }: SizeGuideTemplate
                 : state.message || 'An error occurred.';
              toast.error(errorMessage);
         }
-    }, [state, isUpdate, router, queryClient]);
+    }, [state, isUpdate, router, queryClient, cache]);
 
     const parseServerError = (error: string | Record<string, any>): string => {
          if (typeof error === 'string') {
