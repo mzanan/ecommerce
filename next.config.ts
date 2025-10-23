@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'anwmlilknhhphojpgyqa.supabase.co',
+        hostname: 'fbulkjsfhkjvccijgxbc.supabase.co',
       },
     ],
   },
@@ -28,7 +28,7 @@ const nextConfig: NextConfig = {
   experimental: {
     reactCompiler: false,
     serverActions: {
-      bodySizeLimit: '5mb',
+      bodySizeLimit: '25mb',
     },
   },
 };
