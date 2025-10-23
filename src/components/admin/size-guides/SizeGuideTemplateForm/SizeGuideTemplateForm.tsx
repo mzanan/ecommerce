@@ -1,4 +1,3 @@
-/* Content will be moved from src/app/admin/size-guides/_components/SizeGuideTemplateForm.tsx */ 
 'use client';
 
 import React, { useCallback, useEffect, useActionState, startTransition } from 'react';
@@ -42,12 +41,12 @@ const generateDefaultRows = (sizes: string[], numHeaders: number): string[][] =>
     ]);
 };
 
-const defaultHeaders = ['Size', 'Chest', 'Length'];
+const defaultHeaders = ['Size', 'Chest', 'Waist', 'Low Hip', 'Waist circumference', 'Inseam'];
 const defaultRows = generateDefaultRows(STANDARD_SIZES, defaultHeaders.length);
 
 const extractGuideData = (initialData: SizeGuideTemplate | null | undefined): { headers: { value: string }[], rows: string[][] } => {
     const defaultData = {
-        headers: defaultHeaders.map(h => ({ value: h })),
+        headers: defaultHeaders.map(h => ({ value: h + ' (cm)' })),
         rows: defaultRows,
     };
 

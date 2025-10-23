@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { createServerActionClient } from '@/lib/supabase/server';
-import { sizeGuideTemplateFormSchema } from '@/lib/schemas/sizeGuideTemplateSchema';
+import { sizeGuideTemplateStorageSchema } from '@/lib/schemas/sizeGuideTemplateSchema';
 import type { ActionResponse } from '@/types/actions';
 import type { FetchDataParams } from '@/types/adminDataTable';
 import type { SizeGuideTemplate, BasicSizeGuideTemplate } from '@/types/sizeGuide';
@@ -38,7 +38,7 @@ export async function createSizeGuideTemplate(
          return { success: false, message: 'Invalid guide data format.' };
     }
 
-    const validatedFields = sizeGuideTemplateFormSchema.safeParse(rawData);
+    const validatedFields = sizeGuideTemplateStorageSchema.safeParse(rawData);
 
     if (!validatedFields.success) {
         console.error('Validation Error:', validatedFields.error.flatten().fieldErrors);
@@ -90,7 +90,7 @@ export async function updateSizeGuideTemplate(
          return { success: false, message: 'Invalid guide data format.' };
     }
 
-    const validatedFields = sizeGuideTemplateFormSchema.safeParse(rawData);
+    const validatedFields = sizeGuideTemplateStorageSchema.safeParse(rawData);
 
     if (!validatedFields.success) {
         console.error('Validation Error:', validatedFields.error.flatten().fieldErrors);

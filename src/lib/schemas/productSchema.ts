@@ -9,7 +9,7 @@ export const productFormSchema = z.object({
   description: z.string().optional(),
   price: z.preprocess(
       (val) => typeof val === 'string' ? parseFloat(val.replace(',', '.')) : val,
-      z.number({ invalid_type_error: 'Price must be a number.' })
+      z.number({ message: 'Price must be a number.' })
        .positive({ message: "Price must be a positive number." })
   ),
   is_active: z.boolean().default(true),
@@ -26,7 +26,7 @@ export const productFormSchema = z.object({
   category_id: z.string().uuid({ message: "Product category is required." }),
   stock_quantity: z.preprocess(
       (val) => (typeof val === 'string' && val.trim() !== '' ? parseInt(val, 10) : typeof val === 'number' ? val : undefined),
-      z.number({ invalid_type_error: 'Stock quantity must be a number.' })
+      z.number({ message: 'Stock quantity must be a number.' })
        .int({ message: "Stock quantity must be an integer." })
        .nonnegative({ message: "Stock quantity cannot be negative." })
        .default(0)
