@@ -6,7 +6,7 @@ export const productFormSchema = z.object({
   name: z.string().min(3, { message: "Name must be at least 3 characters." }),
   slug: z.string().min(3, { message: "Slug must be at least 3 characters." })
            .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, { message: "Slug must be lowercase alphanumeric with hyphens only." }),
-  description: z.string().optional(),
+  description: z.string().nullish(),
   price: z.preprocess(
       (val) => typeof val === 'string' ? parseFloat(val.replace(',', '.')) : val,
       z.number({ message: 'Price must be a number.' })
@@ -34,8 +34,6 @@ export const productFormSchema = z.object({
   selected_size_names: z.array(z.string()).optional(),
 
   setIds: z.array(z.string()).optional(),
-
-
 });
 
 

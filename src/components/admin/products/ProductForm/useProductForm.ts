@@ -81,9 +81,17 @@ export function useProductForm({ initialData }: UseProductFormProps) {
         const result = await fetchSizesFromSizeGuideAction(sizeGuideId);
         if (result.data) {
             setAvailableSizesFromGuide(result.data);
-            
-            if (!initialData?.id || forceSelectAll) form.setValue('selected_size_names', result.data);
-            
+
+            if (!initialData?.id || forceSelectAll) {
+                form.setValue('selected_size_names', result.data);
+            } else {
+                const currentSelected = form.getValues('selected_size_names') || [];
+                const reconciled = currentSelected.filter((s) => result.data!.includes(s));
+                if (reconciled.length !== currentSelected.length || reconciled.length === 0) {
+                    form.setValue('selected_size_names', reconciled.length > 0 ? reconciled : result.data);
+                }
+            }
+
         } else {
             console.error(`Failed to fetch sizes for size guide ${sizeGuideId}:`, result.error);
         }

@@ -20,7 +20,7 @@ export const baseSetFormSchema = z.object({
           .max(255)
           .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, { message: 'Slug can only contain lowercase letters, numbers, and hyphens' })
           .default(''),
-  description: z.string().max(1000, { message: 'Description cannot exceed 1000 characters'}).optional().nullable(),
+  description: z.string().max(1000, { message: 'Description cannot exceed 1000 characters'}).optional(),
   type: z.enum(SET_TYPES, { message: "Set type is required" }).default(SET_TYPES[0]),
   layout_type: z.enum(SET_LAYOUT_TYPES, { message: "Layout type is required" }).default(SET_LAYOUT_TYPES[0]),
   is_active: z.boolean().default(true),
