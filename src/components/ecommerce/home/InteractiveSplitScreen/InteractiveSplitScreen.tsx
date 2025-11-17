@@ -63,7 +63,7 @@ const PathSelector = forwardRef<HTMLElement, PathSelectorProps>((
       >
         <div className="ml-[20%] lg:ml-[33%]">
           <AnimatedWord 
-            word="White" 
+            word="Day" 
             onClick={handleFideliClick}
             className="text-4xl md:text-7xl lg:text-8xl font-medium text-gray-800 font-['Cormorant_Garamond'] mb-4 w-full"
             hoverColor="silver"
@@ -84,7 +84,7 @@ const PathSelector = forwardRef<HTMLElement, PathSelectorProps>((
       >
         <div className="mr-[20%] lg:mr-[33%]">
           <AnimatedWord
-            word="Black"
+            word="Night"
             onClick={handleInfideliClick}
             className="text-4xl md:text-7xl lg:text-8xl font-medium text-white font-['Great_Vibes'] mb-4 italic"
             hoverColor="red"

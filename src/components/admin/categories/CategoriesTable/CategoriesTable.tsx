@@ -168,7 +168,11 @@ export default function CategoriesTable({
                 <TableLoadingRow colSpan={5} />
               ) : filteredAndSortedCategories?.length ? (
                 filteredAndSortedCategories.map((category) => (
-                  <TableRow key={category.id}>
+                  <TableRow 
+                    key={category.id}
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() => onEdit(category)}
+                  >
                     <TableCell>
                       <div className="capitalize">{category.name}</div>
                     </TableCell>
@@ -181,7 +185,7 @@ export default function CategoriesTable({
                     <TableCell>
                       {new Date(category.updated_at).toLocaleDateString()}
                   </TableCell>
-                    <TableCell>
+                    <TableCell onClick={(e) => e.stopPropagation()}>
                       <ActionButtons
                         itemId={category.id}
                         itemName={category.name}

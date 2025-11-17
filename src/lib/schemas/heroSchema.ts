@@ -14,7 +14,7 @@ export const heroContentFormSchema = z.object({
         if (Array.isArray(files) && files.length > 0 && files[0] instanceof File && files[0].size > 0) return true;
         if (typeof FileList !== 'undefined' && files instanceof FileList && files.length > 0 && files[0]?.size > 0) return true;
         return true;
-    }, 'Invalid image file.')
+    }, 'Invalid file.')
     .refine((files) => {
         if (!files) return true;
         const fileArray = Array.isArray(files) && files.every(f => f instanceof File) 
@@ -23,8 +23,12 @@ export const heroContentFormSchema = z.object({
                                 ? Array.from(files) 
                                 : (files instanceof File ? [files] : []);
         if (fileArray.length === 0) return true; 
-        return fileArray.every(file => file.size <= 5 * 1024 * 1024); 
-    }, `Each image must be 5MB or less.`)
+        return fileArray.every(file => {
+          const isVideo = typeof file.type === 'string' && file.type.startsWith('video/');
+          const maxSize = isVideo ? 100 * 1024 * 1024 : 5 * 1024 * 1024;
+          return file.size <= maxSize;
+        }); 
+    }, `Each file must be within size limits.`)
     .refine((files) => {
         if (!files) return true;
         const fileArray = Array.isArray(files) && files.every(f => f instanceof File) 
@@ -33,9 +37,10 @@ export const heroContentFormSchema = z.object({
                                 ? Array.from(files) 
                                 : (files instanceof File ? [files] : []);
         if (fileArray.length === 0) return true; 
-        const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
-        return fileArray.every(file => ACCEPTED_IMAGE_TYPES.includes(file.type));
-    }, "Only .jpg, .jpeg, .png, and .webp formats are supported.")
+        const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif"];
+        const ACCEPTED_VIDEO_TYPES = ["video/mp4", "video/webm", "video/ogg"];
+        return fileArray.every(file => ACCEPTED_IMAGE_TYPES.includes(file.type) || ACCEPTED_VIDEO_TYPES.includes(file.type));
+    }, "Supported formats: .jpg, .jpeg, .png, .webp, .gif, .mp4, .webm, .ogg.")
     .optional(), 
     image_url: z.string().url().optional().nullable(),
   imageOrderChanged: z.boolean().optional(), 

@@ -12,6 +12,7 @@ interface HeroImageProps {
 
 const HeroImage = forwardRef<HTMLDivElement, HeroImageProps>(({ imageUrl, isLoading, isIosDevice = false }, ref) => {
   const { getSnapClasses } = useSnapClasses({ isIosDevice });
+  const isVideoUrl = (url: string) => /\.(mp4|webm|ogg)$/i.test(url);
   
   if (isLoading && !imageUrl) {
     return (
@@ -21,7 +22,17 @@ const HeroImage = forwardRef<HTMLDivElement, HeroImageProps>(({ imageUrl, isLoad
   return (
     <div ref={ref} className={`h-[calc(100vh-var(--header-height))] bg-black ${getSnapClasses()}`}>
       <section className='relative h-full w-full'>
-        {imageUrl && (
+        {imageUrl && (isVideoUrl(imageUrl) ? (
+          <video
+            src={imageUrl}
+            className='h-full w-full object-cover'
+            autoPlay
+            muted
+            loop
+            playsInline
+            controls={false}
+          />
+        ) : (
           <Image 
             src={imageUrl}
             alt='Hero background image'
@@ -29,7 +40,7 @@ const HeroImage = forwardRef<HTMLDivElement, HeroImageProps>(({ imageUrl, isLoad
             priority
             className='object-cover'
           />
-        )}
+        ))}
       </section>
     </div>
   );

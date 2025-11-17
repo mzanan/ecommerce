@@ -58,7 +58,7 @@ export function ImageUploadSection({
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Images</CardTitle>
+                <CardTitle>{aspectRatio === 'video' ? 'Media' : 'Images'}</CardTitle>
                 {form.formState.errors.images?.message && (
                    <p className="text-sm font-medium text-destructive">{form.formState.errors.images.message as string}</p>
                 )}
@@ -70,7 +70,7 @@ export function ImageUploadSection({
                        ref={fileInputRef}
                        onChange={handleImageChange}
                        multiple={maxImages !== 1}
-                       accept="image/jpeg,image/png,image/webp,image/gif"
+                       accept={aspectRatio === 'video' ? 'image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/ogg' : 'image/jpeg,image/png,image/webp,image/gif'}
                        style={{ display: 'none' }}
                        id={`file-upload-${entityName}`}
                        disabled={isPending}
@@ -80,7 +80,7 @@ export function ImageUploadSection({
                         onClick={() => fileInputRef.current?.click()}
                         disabled={isPending}
                     >
-                       {isPending ? 'Uploading...' : `Upload ${maxImages === 1 ? 'Image' : 'Images'}`}
+                       {isPending ? 'Uploading...' : `Upload ${maxImages === 1 ? (aspectRatio === 'video' ? 'Media' : 'Image') : (aspectRatio === 'video' ? 'Media' : 'Images')}`}
                    </Button>
                    {imagesToRender.length > 0 && (
                        <Button
@@ -105,7 +105,8 @@ export function ImageUploadSection({
                 {isPending && imagesToRender.length > 0 && imagesToRender[0].id === 'uploading' && (
                     <div className="flex flex-col items-center justify-center gap-4 p-8 border-2 border-dashed rounded-lg">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-                        <p className="text-sm text-muted-foreground font-medium">Uploading image...</p>
+                        <p className="text-sm text-muted-foreground font-medium">Uploading media...</p>
+                        <p className="text-xs text-muted-foreground">Check console for progress</p>
                     </div>
                 )}
                 

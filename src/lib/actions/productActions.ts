@@ -345,7 +345,7 @@ export async function deleteProduct(productId: string): Promise<ActionResponse> 
     try {
         const { data: productData, error: fetchError } = await supabase
             .from('products')
-            .select('slug')
+            .select('slug, product_images(image_url)')
             .eq('id', productId)
             .single();
 
@@ -354,6 +354,33 @@ export async function deleteProduct(productId: string): Promise<ActionResponse> 
                 return { success: false, error: 'Product not found' };
             }
             return { success: false, error: `Error fetching product: ${fetchError.message}` };
+        }
+
+        const { error: deleteImagesError } = await supabase
+            .from('product_images')
+            .delete()
+            .eq('product_id', productId);
+
+        if (deleteImagesError) {
+            console.error('[Server Action Error] Delete Product Images:', deleteImagesError.message);
+        }
+
+        const { error: deleteVariantsError } = await supabase
+            .from('product_variants')
+            .delete()
+            .eq('product_id', productId);
+
+        if (deleteVariantsError) {
+            console.error('[Server Action Error] Delete Product Variants:', deleteVariantsError.message);
+        }
+
+        const { error: deleteSetProductsError } = await supabase
+            .from('set_products')
+            .delete()
+            .eq('product_id', productId);
+
+        if (deleteSetProductsError) {
+            console.error('[Server Action Error] Delete Set Products:', deleteSetProductsError.message);
         }
 
         const { error: deleteError } = await supabase

@@ -32,11 +32,12 @@ export default function Home({
   } = useHome(homepageItemsData, scrollContainerRef);
 
   const heroImageUrl = heroContentData?.image_url;
+  const isImageUrl = (url: string) => /\.(jpe?g|png|webp|gif)$/i.test(url);
 
   const allImageUrls = React.useMemo(() => {
     const urls: string[] = [];
     
-    if (heroImageUrl) urls.push(heroImageUrl);
+    if (heroImageUrl && isImageUrl(heroImageUrl)) urls.push(heroImageUrl);
     
     urls.push(...extractImageUrls(homepageItemsData));
     urls.push(...extractImageUrls(aboutContentData));

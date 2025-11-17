@@ -23,7 +23,7 @@ export const AdminHeader = React.memo(function AdminHeader() {
     const { sessionData, isLoading } = useAuth();
 
     const userName = sessionData?.name ?? 'Admin'; 
-    const userEmail = sessionData?.email ?? 'admin@infideli.com';
+    const userEmail = sessionData?.email;
     const userAvatarUrl = sessionData?.avatarUrl ?? undefined;
     const userInitial = userName?.[0]?.toUpperCase() ?? 'A';
 

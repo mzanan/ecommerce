@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
 import {
@@ -28,6 +29,7 @@ type SortKey = 'name' | 'type' | 'is_active' | 'product_count' | 'created_at';
 type SortDirection = 'asc' | 'desc';
 
 export default function SetListClient({ initialSets }: { initialSets?: AdminSetListItem[] }) {
+    const router = useRouter();
     const [sets, setSets] = useState<AdminSetListItem[]>(initialSets || []);
     const [search, setSearch] = useState<string>('');
     const [loading, setLoading] = useState(!initialSets);
@@ -252,7 +254,11 @@ export default function SetListClient({ initialSets }: { initialSets?: AdminSetL
                             </TableRow>
                         ) : (
                             filteredAndSortedSets.map((set) => (
-                                <TableRow key={set.id}>
+                                <TableRow 
+                                    key={set.id}
+                                    className="cursor-pointer hover:bg-muted/50"
+                                    onClick={() => router.push(`/admin/sets/${set.id}/edit`)}
+                                >
                                     <TableCell>
                                         <div className="w-10 h-10 flex items-center justify-center p-1">
                                         {set.image_url ? (
@@ -281,7 +287,7 @@ export default function SetListClient({ initialSets }: { initialSets?: AdminSetL
                                     </TableCell>
                                     <TableCell>{set.product_count || 0}</TableCell>
                                     <TableCell>{formatDate(set.created_at)}</TableCell>
-                                    <TableCell>
+                                    <TableCell onClick={(e) => e.stopPropagation()}>
                                         <ActionButtons
                                             itemId={set.id}
                                             itemName={set.name}

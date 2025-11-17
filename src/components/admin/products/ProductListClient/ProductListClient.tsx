@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import {
   Table,
@@ -25,6 +26,7 @@ type SortKey = 'name' | 'slug' | 'price' | 'is_active' | 'created_at';
 type SortDirection = 'asc' | 'desc';
 
 export function ProductListClient() {
+  const router = useRouter();
   const [search, setSearch] = useState<string>('');
   const [sortKey, setSortKey] = useState<SortKey>('name');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
@@ -183,7 +185,11 @@ export function ProductListClient() {
                 </TableRow>
               ) : filteredAndSortedProducts?.length ? (
                 filteredAndSortedProducts.map((product) => (
-                  <TableRow key={product.id}>
+                  <TableRow 
+                    key={product.id}
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() => router.push(`/admin/products/${product.id}/edit`)}
+                  >
                     <TableCell>
                       <div className="w-10 h-10 flex items-center justify-center p-1">
                         {product.product_images?.[0]?.image_url ? (
@@ -213,7 +219,7 @@ export function ProductListClient() {
                     <TableCell>
                       {new Date(product.created_at).toLocaleDateString()}
                     </TableCell>
-                    <TableCell>
+                    <TableCell onClick={(e) => e.stopPropagation()}>
                       <DataTableActions
                         itemId={product.id}
             entityName="Product"

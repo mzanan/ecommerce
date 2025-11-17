@@ -1,21 +1,19 @@
 import { createServerActionClient } from "@/lib/supabase/server";
 import { v4 as uuidv4 } from 'uuid';
+import { optimizeImageFile, optimizeVideoFile } from '@/lib/helpers/mediaOptimization';
 
 const BUCKET_NAME = process.env.SUPABASE_BUCKET || 'infideli-images';
 
 export async function uploadProductImage(file: File): Promise<{ publicUrl: string | null, path: string | null, error: string | null }> {
     const supabase = createServerActionClient();
-    const fileExtension = file.name.split('.').pop();
-    const uniqueFileName = `${uuidv4()}.${fileExtension}`;
+    const optimized = await optimizeImageFile(file, { maxWidth: 1600, maxHeight: 1600, format: 'webp', quality: 75 });
+    const uniqueFileName = `${uuidv4()}.${optimized.ext}`;
     const filePath = `products/${uniqueFileName}`;
 
     try {
         const { data: uploadData, error: uploadError } = await supabase.storage
             .from(BUCKET_NAME)
-            .upload(filePath, file, {
-                cacheControl: '3600',
-                upsert: false,
-            });
+            .upload(filePath, optimized.buffer, { cacheControl: '3600', upsert: false, contentType: optimized.mimeType });
 
         if (uploadError) {
             console.error('[Storage Helper Error] Upload Product Image:', uploadError.message);
@@ -72,8 +70,8 @@ export async function deleteProductImage(imageUrl: string): Promise<{ success: b
 
 export async function uploadCollectionImage(file: File): Promise<{ publicUrl: string | null, path: string | null, error: string | null }> {
     const supabase = createServerActionClient();
-    const fileExtension = file.name.split('.').pop();
-    const uniqueFileName = `${uuidv4()}.${fileExtension}`;
+    const optimized = await optimizeImageFile(file, { maxWidth: 1920, maxHeight: 1920, format: 'webp', quality: 75 });
+    const uniqueFileName = `${uuidv4()}.${optimized.ext}`;
     const filePath = `sets/${uniqueFileName}`;
 
     try {
@@ -83,10 +81,7 @@ export async function uploadCollectionImage(file: File): Promise<{ publicUrl: st
 
         const { data: uploadData, error: uploadError } = await supabase.storage
             .from(BUCKET_NAME)
-            .upload(filePath, file, {
-                cacheControl: '3600',
-                upsert: false,
-            });
+            .upload(filePath, optimized.buffer, { cacheControl: '3600', upsert: false, contentType: optimized.mimeType });
 
         if (uploadError) {
             console.error('[Storage Helper Error] Upload Set Image:', uploadError.message);
@@ -135,17 +130,14 @@ export async function deleteCollectionImage(imagePath: string): Promise<{ succes
 
 export async function uploadAboutImage(file: File): Promise<{ publicUrl: string | null, path: string | null, error: string | null }> {
     const supabase = createServerActionClient();
-    const fileExtension = file.name.split('.').pop();
-    const uniqueFileName = `${uuidv4()}.${fileExtension}`;
+    const optimized = await optimizeImageFile(file, { maxWidth: 1600, maxHeight: 1600, format: 'webp', quality: 70 });
+    const uniqueFileName = `${uuidv4()}.${optimized.ext}`;
     const filePath = `about/${uniqueFileName}`;
 
     try {
         const { data: uploadData, error: uploadError } = await supabase.storage
             .from(BUCKET_NAME)
-            .upload(filePath, file, {
-                cacheControl: '3600',
-                upsert: false,
-            });
+            .upload(filePath, optimized.buffer, { cacheControl: '3600', upsert: false, contentType: optimized.mimeType });
 
         if (uploadError) {
             console.error('[Storage Helper Error] Upload About Image:', uploadError.message);
@@ -211,25 +203,49 @@ export function getStoragePathFromUrl(publicUrl: string, bucketName: string): st
     }
 }
 
-export async function uploadHeroImage(file: File): Promise<{ publicUrl: string | null, path: string | null, error: string | null }> {
+export async function uploadHeroImage(file: File, onProgress?: (percent: number) => void): Promise<{ publicUrl: string | null, path: string | null, error: string | null }> {
     const supabase = createServerActionClient();
-    const fileExtension = file.name.split('.').pop();
-    const uniqueFileName = `${uuidv4()}.${fileExtension}`;
+    const isVideo = typeof file.type === 'string' && file.type.startsWith('video/');
+    
+    console.log('[HERO STORAGE] Processing file:', file.name, 'size:', (file.size / 1024 / 1024).toFixed(2), 'MB', 'isVideo:', isVideo);
+    
+    let optimized: { buffer: Buffer; mimeType: string; ext: string };
+    try {
+        if (isVideo) {
+            console.log('[HERO STORAGE] Starting video optimization...');
+            optimized = await optimizeVideoFile(file, { 
+                targetHeight: 720, 
+                bitrateKbps: 1200, 
+                fps: 24, 
+                format: 'mp4',
+                onProgress 
+            });
+            console.log('[HERO STORAGE] Video optimized to:', (optimized.buffer.length / 1024 / 1024).toFixed(2), 'MB');
+        } else {
+            console.log('[HERO STORAGE] Starting image optimization...');
+            optimized = await optimizeImageFile(file, { maxWidth: 1920, maxHeight: 1080, format: 'webp', quality: 75 });
+            console.log('[HERO STORAGE] Image optimized to:', (optimized.buffer.length / 1024 / 1024).toFixed(2), 'MB');
+        }
+    } catch (optError) {
+        console.error('[HERO STORAGE] Optimization failed:', optError);
+        return { publicUrl: null, path: null, error: `Optimization failed: ${optError instanceof Error ? optError.message : 'Unknown error'}` };
+    }
+    
+    const uniqueFileName = `${uuidv4()}.${optimized.ext}`;
     const filePath = `hero/${uniqueFileName}`;
 
     try {
+        console.log('[HERO STORAGE] Uploading to Supabase:', filePath, 'contentType:', optimized.mimeType);
         const { data: uploadData, error: uploadError } = await supabase.storage
             .from(BUCKET_NAME)
-            .upload(filePath, file, {
-                cacheControl: '3600',
-                upsert: false,
-            });
+            .upload(filePath, optimized.buffer, { cacheControl: '3600', upsert: false, contentType: optimized.mimeType });
 
         if (uploadError) {
             console.error('[HERO STORAGE] Upload error:', uploadError.message, uploadError);
             return { publicUrl: null, path: null, error: `Storage upload failed: ${uploadError.message}` };
         }
 
+        console.log('[HERO STORAGE] Upload successful:', uploadData.path);
         const { data: urlData } = supabase.storage
             .from(BUCKET_NAME)
             .getPublicUrl(uploadData.path);

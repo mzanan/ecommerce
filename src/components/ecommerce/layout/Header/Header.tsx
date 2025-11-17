@@ -69,7 +69,7 @@ export default function Header() {
           onClick={handleLogoClick}
         >
            <span className="text-2xl font-bold tracking-tighter uppercase">
-             <span>Infideli</span>
+             <span>Noire</span>
            </span>
         </Link>
 

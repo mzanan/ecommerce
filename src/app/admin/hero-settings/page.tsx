@@ -36,8 +36,8 @@ export default async function HeroSettingsPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <AdminPageTitle 
-        title="Hero Image" 
-        description="Set a Hero Image"
+        title="Hero Media" 
+        description="Set a Hero media (image or video)"
       />
       <Card>
         <CardContent>

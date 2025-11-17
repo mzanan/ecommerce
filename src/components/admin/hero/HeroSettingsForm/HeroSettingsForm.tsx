@@ -39,7 +39,7 @@ export default function HeroSettingsForm({ initialData }: { initialData: HeroDbR
       entityName="Hero Content"
       isUpdate={!!initialData} 
       maxImages={1}
-      imageAspectRatio="square"
+      imageAspectRatio="video"
       hideSubmitButton={true}
     >
       <input type="hidden" {...register('id')} value={String(HERO_CONTENT_ID)} />

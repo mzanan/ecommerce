@@ -51,12 +51,28 @@ export const SortableImageItem = ({
         buttonTitle = "Remove staged image";
     }
 
+    const isVideo = aspectRatio === 'video' && (
+        (typeof item.file?.type === 'string' && item.file.type.startsWith('video/')) ||
+        (typeof item.url === 'string' && /\.(mp4|webm|ogg)$/i.test(item.url))
+    );
+
     return (
         <div
             ref={setNodeRef}
             style={style}
             className={`relative group border rounded-md overflow-hidden bg-muted ${aspectRatio === 'portrait' ? 'w-48 aspect-[9/16]' : aspectRatio === 'video' ? 'w-96 aspect-video' : 'w-48 aspect-square'}`}
         >
+            {isVideo ? (
+                <video
+                    key={`${item.id}-${item.url}-video`}
+                    src={item.url}
+                    className={`h-full w-full object-cover ${item.isMarkedForDelete ? 'opacity-30' : ''}`}
+                    controls
+                    muted
+                    playsInline
+                    loop
+                />
+            ) : (
             <Image
                 key={`${item.id}-${item.url}`}
                 src={item.url} 
@@ -66,6 +82,7 @@ export const SortableImageItem = ({
                 className={`object-cover ${item.isMarkedForDelete ? 'opacity-30' : ''}`}
                 unoptimized={!item.isExisting}
             />
+            )}
             {!item.isMarkedForDelete && (
                 <button
                     {...attributes}

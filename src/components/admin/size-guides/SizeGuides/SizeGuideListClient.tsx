@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useCallback, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   Table,
@@ -24,6 +25,7 @@ type SortKey = 'name' | 'created_at';
 type SortDirection = 'asc' | 'desc';
 
 export function SizeGuideListClient() {
+  const router = useRouter();
   const [search, setSearch] = useState<string>('');
   const [sortKey, setSortKey] = useState<SortKey>('name');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
@@ -169,14 +171,18 @@ export function SizeGuideListClient() {
                 </TableRow>
               ) : filteredAndSortedTemplates?.length ? (
                 filteredAndSortedTemplates.map((template) => (
-                  <TableRow key={template.id}>
+                  <TableRow 
+                    key={template.id}
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() => router.push(`/admin/size-guides/${template.id}/edit`)}
+                  >
                     <TableCell>
                       <span className="font-medium">{template.name}</span>
                     </TableCell>
                     <TableCell>
                       {new Date(template.created_at).toLocaleDateString()}
                     </TableCell>
-                    <TableCell>
+                    <TableCell onClick={(e) => e.stopPropagation()}>
                       <DataTableActions
                         itemId={template.id}
             entityName="Size Guide Template"
