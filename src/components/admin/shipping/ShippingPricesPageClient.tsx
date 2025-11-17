@@ -67,6 +67,7 @@ export default function ShippingPricesPageClient({
     const handleActionComplete = () => {
         fetchPrices();
         setEditingPrice(undefined);
+        setFormKey(Date.now().toString());
     };
 
     const handleCancel = () => {
