@@ -32,7 +32,7 @@ function getCountriesData(): Country[] {
             name: country.name,
         }));
     }
-    return countriesDataCache;
+    return countriesDataCache as Country[];
 }
 
 function getFlagEmoji(countryCode: string): string {

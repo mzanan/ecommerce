@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React from 'react';
 import PathSelector from '@/components/ecommerce/home/InteractiveSplitScreen/InteractiveSplitScreen';
 import AboutSection from '@/components/ecommerce/home/AboutSection/AboutSection';
 import HeroImage from '@/components/ecommerce/home/HeroImage/HeroImage';
@@ -17,7 +17,6 @@ export default function Home({
   heroContentData,
   isIosDevice = false
 }: HomeProps) {
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const { getSnapClasses, getScrollContainerClasses } = useSnapClasses({ isIosDevice });
   
   const {
@@ -29,7 +28,7 @@ export default function Home({
     processedHomepageItems,
     effectiveSelectedType,
     isRestoringScroll,
-  } = useHome(homepageItemsData, scrollContainerRef);
+  } = useHome(homepageItemsData);
 
   const heroImageUrl = heroContentData?.image_url;
   const isImageUrl = (url: string) => /\.(jpe?g|png|webp|gif)$/i.test(url);
@@ -48,7 +47,7 @@ export default function Home({
   useImagePreloader(allImageUrls, { enabled: true, priority: true });
 
   const getContainerClasses = () => {
-    const baseClasses = "overflow-y-auto overflow-x-hidden h-screen w-full max-w-[100vw]";
+    const baseClasses = "overflow-x-hidden w-full max-w-[100vw]";
     if (isRestoringScroll) {
       return baseClasses;
     }
@@ -90,7 +89,7 @@ export default function Home({
   };
 
   return (
-    <div ref={scrollContainerRef} className={getContainerClasses()}>
+    <div className={getContainerClasses()}>
       <HeroImage imageUrl={heroImageUrl} isIosDevice={isIosDevice} />
 
       <PathSelector

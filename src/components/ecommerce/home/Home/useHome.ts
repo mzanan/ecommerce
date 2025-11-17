@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import type { SetType } from '@/lib/schemas/setSchema';
 import type { HomePageItemOrchestrator } from '@/types/home';
 import { useScrollRestorationContext } from '@/components/providers/ScrollRestorationProvider';
 
-export function useHome(homepageItemsData: HomePageItemOrchestrator[], scrollContainerRef: React.RefObject<HTMLDivElement | null>) {
+export function useHome(homepageItemsData: HomePageItemOrchestrator[]) {
   const [selectedType, setSelectedType] = useState<SetType | null>(null);
   const [hasScrolledPastSelector, setHasScrolledPastSelector] = useState(false);
   const [shouldAutoScroll, setShouldAutoScroll] = useState(false);
@@ -17,7 +17,7 @@ export function useHome(homepageItemsData: HomePageItemOrchestrator[], scrollCon
   const { isInitialLoadInSession } = useScrollRestorationContext();
 
   useEffect(() => {
-    if (hasRestoredScrollRef.current || !scrollContainerRef.current) return;
+    if (hasRestoredScrollRef.current) return;
 
     const restoreScrollPosition = () => {
       const navigationEntries = typeof window !== 'undefined' ? performance.getEntriesByType("navigation") : [];
@@ -32,23 +32,21 @@ export function useHome(homepageItemsData: HomePageItemOrchestrator[], scrollCon
         shouldRestore = true;
       }
 
-      if (shouldRestore && scrollContainerRef.current) {
+      if (shouldRestore && typeof window !== 'undefined') {
         const savedScrollPos = localStorage.getItem('homeScrollPos');
         if (savedScrollPos) {
           const scrollPos = parseInt(savedScrollPos, 10);
           if (!isNaN(scrollPos) && scrollPos > 0) {
             setIsRestoringScroll(true);
             setTimeout(() => {
-              if (scrollContainerRef.current) {
-                isScrollingProgrammatically.current = true;
-                scrollContainerRef.current.scrollTo({ top: scrollPos, behavior: 'smooth' });
-                hasRestoredScrollRef.current = true;
-                
-                setTimeout(() => {
-                  isScrollingProgrammatically.current = false;
-                  setIsRestoringScroll(false);
-                }, 1000);
-              }
+              isScrollingProgrammatically.current = true;
+              window.scrollTo({ top: scrollPos, behavior: 'smooth' });
+              hasRestoredScrollRef.current = true;
+              
+              setTimeout(() => {
+                isScrollingProgrammatically.current = false;
+                setIsRestoringScroll(false);
+              }, 1000);
             }, 200);
           } else {
             hasRestoredScrollRef.current = true;
@@ -74,12 +72,9 @@ export function useHome(homepageItemsData: HomePageItemOrchestrator[], scrollCon
         window.removeEventListener('load', restoreScrollPosition);
       }
     };
-  }, [isInitialLoadInSession, scrollContainerRef]);
+  }, [isInitialLoadInSession]);
 
   useEffect(() => {
-    const scrollContainer = scrollContainerRef.current;
-    if (!scrollContainer) return;
-
     const handleScroll = () => {
       if (isScrollingProgrammatically.current || !hasRestoredScrollRef.current) return;
 
@@ -97,45 +92,38 @@ export function useHome(homepageItemsData: HomePageItemOrchestrator[], scrollCon
       }
 
       if (typeof window !== 'undefined') {
-        localStorage.setItem('homeScrollPos', String(scrollContainer.scrollTop));
+        localStorage.setItem('homeScrollPos', String(window.scrollY));
       }
     };
 
     const handleBeforeUnload = () => {
-      if (scrollContainer && typeof window !== 'undefined') {
-        localStorage.setItem('homeScrollPos', String(scrollContainer.scrollTop));
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('homeScrollPos', String(window.scrollY));
       }
     };
 
-    scrollContainer.addEventListener("scroll", handleScroll, { passive: true });
-    
-    if (typeof window !== 'undefined') {
-      window.addEventListener('beforeunload', handleBeforeUnload);
-    }
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener('beforeunload', handleBeforeUnload);
 
     return () => {
-      scrollContainer.removeEventListener("scroll", handleScroll);
-      if (typeof window !== 'undefined') {
-        window.removeEventListener('beforeunload', handleBeforeUnload);
-      }
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
     };
-  }, [selectedType, scrollContainerRef]);
+  }, [selectedType]);
 
   useEffect(() => {
-    if (shouldAutoScroll && scrollContainerRef.current && (whiteSectionRef.current || blackSectionRef.current)) {
+    if (shouldAutoScroll && (whiteSectionRef.current || blackSectionRef.current)) {
       const timeoutId = setTimeout(() => {
         isScrollingProgrammatically.current = true;
 
         const effectiveSelectedType = selectedType || "DAY";
         const targetSection = effectiveSelectedType === "DAY" ? whiteSectionRef.current : blackSectionRef.current;
 
-        if (targetSection && scrollContainerRef.current) {
-          const containerRect = scrollContainerRef.current.getBoundingClientRect();
+        if (targetSection) {
           const targetRect = targetSection.getBoundingClientRect();
-          
-          const scrollTop = scrollContainerRef.current.scrollTop + (targetRect.top - containerRect.top);
+          const scrollTop = window.scrollY + targetRect.top;
 
-          scrollContainerRef.current.scrollTo({
+          window.scrollTo({
             top: scrollTop,
             behavior: "smooth",
           });
@@ -150,7 +138,7 @@ export function useHome(homepageItemsData: HomePageItemOrchestrator[], scrollCon
 
       return () => clearTimeout(timeoutId);
     }
-  }, [shouldAutoScroll, selectedType, scrollContainerRef]);
+  }, [shouldAutoScroll, selectedType]);
 
   const handlePathSelect = (type: SetType) => {
     isScrollingProgrammatically.current = false;
