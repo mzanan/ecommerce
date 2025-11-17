@@ -69,7 +69,9 @@ export async function optimizeVideoFile(file: File, options: VideoOptimizeOption
       resolvedFfmpegPath = candidate;
       console.log('[VIDEO OPT] Using ffmpeg at:', resolvedFfmpegPath);
       break;
-    } catch {}
+    } catch {
+      // Path not accessible, try next candidate
+    }
   }
   if (!resolvedFfmpegPath) {
     resolvedFfmpegPath = 'ffmpeg';
@@ -148,9 +150,15 @@ export async function optimizeVideoFile(file: File, options: VideoOptimizeOption
   const buffer = await fs.readFile(outputPath);
   console.log('[VIDEO OPT] Output size:', (buffer.length / 1024 / 1024).toFixed(2), 'MB');
 
-  try { await fs.unlink(inputPath); } catch {}
-  try { await fs.unlink(outputPath); } catch {}
-  try { await fs.rmdir(tmpDir); } catch {}
+  try { await fs.unlink(inputPath); } catch {
+    // Ignore cleanup errors
+  }
+  try { await fs.unlink(outputPath); } catch {
+    // Ignore cleanup errors
+  }
+  try { await fs.rmdir(tmpDir); } catch {
+    // Ignore cleanup errors
+  }
 
   return { buffer, mimeType: 'video/mp4', ext: 'mp4' };
 }

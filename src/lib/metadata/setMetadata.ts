@@ -27,11 +27,7 @@ export async function generateSetMetadata({ params }: { params: Promise<{ slug: 
     return generateSEOMetadata({
         name: set.name,
         description: set.description || undefined,
-        slug: set.slug,
         type: set.type as 'DAY' | 'NIGHT',
-        images: set.set_images?.map(img => ({
-            image_url: img.image_url,
-            alt_text: img.alt_text || set.name
-        })) || []
+        imageUrl: set.set_images?.[0]?.image_url || undefined
     });
 } 
