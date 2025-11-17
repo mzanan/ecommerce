@@ -60,8 +60,8 @@ export default function Home({
       <div ref={whiteSectionRef} className={getSnapClasses()}>
         <DisplaySets 
           homepageItems={processedHomepageItems}
-          primaryType="FIDELI"
-          secondaryType="INFIDELI"
+          primaryType="DAY"
+          secondaryType="NIGHT"
           setsAnimationProgress={{ get: () => 1, set: () => {}, on: () => () => {} } as any}
           titleVisibilityProgress={{ get: () => 1, set: () => {}, on: () => () => {} } as any}
           isIosDevice={isIosDevice}
@@ -73,8 +73,8 @@ export default function Home({
       <div ref={blackSectionRef} className={getSnapClasses()}>
         <DisplaySets 
           homepageItems={processedHomepageItems}
-          primaryType="INFIDELI"
-          secondaryType="FIDELI"
+          primaryType="NIGHT"
+          secondaryType="DAY"
           setsAnimationProgress={{ get: () => 1, set: () => {}, on: () => () => {} } as any}
           titleVisibilityProgress={{ get: () => 1, set: () => {}, on: () => () => {} } as any}
           isIosDevice={isIosDevice}
@@ -82,7 +82,7 @@ export default function Home({
       </div>
     );
 
-    return effectiveSelectedType === "FIDELI" ? (
+    return effectiveSelectedType === "DAY" ? (
       <>{whiteSection}{blackSection}</>
     ) : (
       <>{blackSection}{whiteSection}</>

@@ -34,15 +34,15 @@ export interface AnimatedWordProps {
 
 export interface DisplaySetsProps {
   homepageItems: (PageComponent & { item_type: 'page_component' } | SetRow & { item_type: 'set' })[];
-  primaryType: 'FIDELI' | 'INFIDELI' | null;
-  secondaryType: 'FIDELI' | 'INFIDELI';
+  primaryType: 'DAY' | 'NIGHT' | null;
+  secondaryType: 'DAY' | 'NIGHT';
   setsAnimationProgress: MotionValue<number>;
   titleVisibilityProgress: MotionValue<number>;
   isIosDevice?: boolean;
 }
 
 export interface SectionTitleComponentProps {
-  type: 'FIDELI' | 'INFIDELI';
+  type: 'DAY' | 'NIGHT';
   titleVisibilityProgress: MotionValue<number>;
   isPrimary: boolean;
 }
@@ -50,15 +50,15 @@ export interface SectionTitleComponentProps {
 export interface AnimatedSetRendererProps {
   set: SetRow;
   isHomepageContext: boolean;
-  type: 'FIDELI' | 'INFIDELI';
+  type: 'DAY' | 'NIGHT';
   index: number;
 }
 
 export interface AnimatedSectionProps {
-  type: 'FIDELI' | 'INFIDELI';
+  type: 'DAY' | 'NIGHT';
   isPrimary: boolean;
   items: React.JSX.Element[];
-  getTypeSpecificClasses: (type: 'FIDELI' | 'INFIDELI', isPrimary: boolean) => string;
+  getTypeSpecificClasses: (type: 'DAY' | 'NIGHT', isPrimary: boolean) => string;
   setsAnimationProgress: MotionValue<number>;
   titleVisibilityProgress: MotionValue<number>;
   shouldControlAnimation?: boolean;

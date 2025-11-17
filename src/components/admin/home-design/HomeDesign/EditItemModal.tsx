@@ -45,14 +45,14 @@ export function EditItemModal({
                 setFormData({
                     title: content?.title || '',
                     text: content?.text || '',
-                    affiliation: component.affiliation || 'FIDELI'
+                    affiliation: component.affiliation || 'DAY'
                 });
             } else if (itemToEdit.item_type === 'set') {
                 const set = itemToEdit;
                  setFormData({
                     name: set.name || '',
                     description: set.description || '',
-                    type: set.type || 'FIDELI',
+                    type: set.type || 'DAY',
                     layout_type: set.layout_type || 'SINGLE_COLUMN',
                  });
             } else {
@@ -110,15 +110,15 @@ export function EditItemModal({
             <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="affiliation" className="text-right">Section</Label>
                  <Select 
-                    value={formData.affiliation || 'FIDELI'} 
-                    onValueChange={(value) => handleSelectChange('affiliation', value as 'FIDELI' | 'INFIDELI')}
+                    value={formData.affiliation || 'DAY'} 
+                    onValueChange={(value) => handleSelectChange('affiliation', value as 'DAY' | 'NIGHT')}
                  >
                      <SelectTrigger id="affiliation" className="col-span-3 w-full">
                          <SelectValue placeholder="Assign to section" />
                      </SelectTrigger>
                      <SelectContent>
-                         <SelectItem value="FIDELI">White</SelectItem>
-                         <SelectItem value="INFIDELI">Black</SelectItem>
+                         <SelectItem value="DAY">Day</SelectItem>
+                         <SelectItem value="NIGHT">Night</SelectItem>
                      </SelectContent>
                  </Select>
             </div>
@@ -138,15 +138,15 @@ export function EditItemModal({
              <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="type" className="text-right">Type</Label>
                  <Select
-                     value={formData.type || 'FIDELI'}
+                     value={formData.type || 'DAY'}
                      onValueChange={(value) => handleSelectChange('type', value as SetType)}
                  >
                      <SelectTrigger id="type" className="col-span-3">
                          <SelectValue placeholder="Select type" />
                      </SelectTrigger>
                      <SelectContent>
-                         <SelectItem value="FIDELI">White</SelectItem>
-                         <SelectItem value="INFIDELI">Black</SelectItem>
+                         <SelectItem value="DAY">Day</SelectItem>
+                         <SelectItem value="NIGHT">Night</SelectItem>
                      </SelectContent>
                  </Select>
             </div>

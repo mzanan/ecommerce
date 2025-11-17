@@ -56,7 +56,7 @@ export function StructuredData({ type, data }: StructuredDataProps) {
           image: data.images?.map((img: any) => img.image_url) || [],
           brand: {
             '@type': 'Brand',
-            name: data.brand || 'Infideli',
+            name: data.brand || 'Noire',
           },
           offers: {
             '@type': 'Offer',

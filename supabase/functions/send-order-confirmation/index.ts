@@ -3,10 +3,10 @@ import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-
 import { SMTPClient } from "https://deno.land/x/denomailer@1.6.0/mod.ts";
 
 const COMPANY_INFO = {
-  NAME: 'INFIDELI',
+  NAME: 'NOIRE',
   WEBSITE_URL: Deno.env.get('NEXT_PUBLIC_APP_URL'),
-  SUPPORT_EMAIL: 'support@infideli.com',
-  CONTACT_EMAIL: 'contact@infideli.com',
+  SUPPORT_EMAIL: 'support@noire.com',
+  CONTACT_EMAIL: 'contact@noire.com',
 } as const;
 
 interface OrderPayloadRecord {
@@ -214,7 +214,7 @@ function generateEmailHtml(
 <body>
     <div class="email-container">
         <div class="header">
-            <a href="${COMPANY_INFO.WEBSITE_URL}" class="logo">INFIDELI</a>
+            <a href="${COMPANY_INFO.WEBSITE_URL}" class="logo">NOIRE</a>
         </div>
         <div class="content">
             <h1 class="greeting">${greeting}</h1>
@@ -246,7 +246,7 @@ function generateEmailHtml(
             </div>
         </div>
         <div class="footer">
-            <a href="${COMPANY_INFO.WEBSITE_URL}" class="logo" style="font-size: 20px; color: #ffffff !important;">INFIDELI</a>
+            <a href="${COMPANY_INFO.WEBSITE_URL}" class="logo" style="font-size: 20px; color: #ffffff !important;">NOIRE</a>
             <p>Premium Women's Lingerie</p>
         </div>
     </div>

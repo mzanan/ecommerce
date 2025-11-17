@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# Complete deployment script for Infideli
+# Complete deployment script for NOIRE
 # This script deploys everything: migrations, edge functions and configures secrets
 
 set -e
 
-echo "🚀 Infideli - Complete Deployment Script"
+echo "🚀 NOIRE - Complete Deployment Script"
 echo "========================================"
 echo ""
 
@@ -138,7 +138,7 @@ fi
 
 echo "5. Test your application!"
 echo ""
-echo -e "${GREEN}✨ Your Infideli backend is fully deployed and ready!${NC}"
+echo -e "${GREEN}✨ Your NOIRE backend is fully deployed and ready!${NC}"
 
 # Display useful commands
 echo ""

@@ -28,7 +28,7 @@ export async function generateSetMetadata({ params }: { params: Promise<{ slug: 
         name: set.name,
         description: set.description || undefined,
         slug: set.slug,
-        type: set.type as 'FIDELI' | 'INFIDELI',
+        type: set.type as 'DAY' | 'NIGHT',
         images: set.set_images?.map(img => ({
             image_url: img.image_url,
             alt_text: img.alt_text || set.name

@@ -57,7 +57,7 @@ export const createSetColumns = (deleteSetActionFn: (id: string) => Promise<Acti
     header: ({ column }) => <DataTableColumnHeader column={column} title="Type" />,
     cell: ({ row }) => {
         const type = row.original.type;
-        const variant = type === 'FIDELI' ? 'secondary' : type === 'INFIDELI' ? 'destructive' : 'outline';
+        const variant = type === 'DAY' ? 'secondary' : type === 'NIGHT' ? 'destructive' : 'outline';
         return type ? <Badge variant={variant}>{type}</Badge> : null;
     },
     filterFn: (row, id, value) => value.includes(row.getValue(id)),

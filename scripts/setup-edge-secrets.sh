@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Script to configure Infideli Edge Function secrets
+# Script to configure NOIRE Edge Function secrets
 # This script configures all necessary environment variables for Edge Functions
 
 set -e

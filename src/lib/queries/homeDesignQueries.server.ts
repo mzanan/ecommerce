@@ -30,7 +30,7 @@ export async function getHomepageLayoutDataAction(pagePath: string): Promise<Act
 export async function createPageComponentAction(args: {
     title: string;
     text: string;
-    affiliation: 'FIDELI' | 'INFIDELI';
+    affiliation: 'DAY' | 'NIGHT';
     pagePath?: string;
     type?: PageComponentType;
 }): Promise<ActionResponse<PageComponent>> {
@@ -57,7 +57,7 @@ export async function createPageComponentAction(args: {
             nextDisplayOrder = lastOrderedComponent.display_order + 1;
         }
 
-        const derivedBgTheme = affiliation === 'FIDELI' ? 'light' : 'dark';
+        const derivedBgTheme = affiliation === 'DAY' ? 'light' : 'dark';
         const content: PageComponentContent = {
             title: title || undefined,
             text: text,

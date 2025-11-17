@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const SET_TYPES = ["FIDELI", "INFIDELI"] as const;
+export const SET_TYPES = ["DAY", "NIGHT"] as const;
 
 export type SetType = typeof SET_TYPES[number];
 

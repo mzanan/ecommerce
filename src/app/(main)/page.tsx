@@ -49,8 +49,8 @@ export default async function HomePage() {
 
 export const metadata = generateMetadata({
   title: 'Home',
-  description: 'Discover Infideli\'s luxury lingerie collections. Elegant FIDELI and seductive INFIDELI sets crafted with premium materials for the modern woman.',
-  keywords: ['luxury lingerie', 'intimate apparel', 'fideli', 'infideli', 'premium underwear', 'women lingerie'],
+  description: 'Discover Noire\'s luxury lingerie collections. Elegant and seductive sets crafted with premium materials for the modern woman.',
+  keywords: ['luxury lingerie', 'intimate apparel', 'dau', 'night', 'premium underwear', 'women lingerie'],
   canonicalUrl: '/',
 });
 

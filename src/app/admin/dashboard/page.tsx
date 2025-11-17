@@ -103,7 +103,7 @@ async function DashboardContent({ searchParams }: { searchParams: Promise<Search
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-muted-foreground">Welcome to your Infideli admin dashboard</p>
+          <p className="text-muted-foreground">Welcome to your Noire admin dashboard</p>
         </div>
         <form action={syncStuckOrdersAction}>
           <SyncOrdersButton />

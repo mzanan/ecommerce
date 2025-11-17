@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# Infideli Supabase Setup Script
-# This script sets up the complete Supabase backend for the Infideli project
+# NOIRE Supabase Setup Script
+# This script sets up the complete Supabase backend for the NOIRE project
 
 set -e
 
-echo "🚀 Infideli Supabase Setup"
+echo "🚀 NOIRE Supabase Setup"
 echo "=========================="
 echo ""
 
@@ -110,4 +110,4 @@ echo "   supabase secrets set SMTP_PORT=587"
 echo "   supabase secrets set SMTP_USER=your-email"
 echo "   supabase secrets set SMTP_PASS=your-password"
 echo ""
-echo -e "${GREEN}✨ Your Infideli backend is ready!${NC}" 
+echo -e "${GREEN}✨ Your NOIRE backend is ready!${NC}" 

@@ -32,22 +32,22 @@ export function usePathSelector({ selectedType, onDiagonalAnimationComplete }: U
     let topPosition = 60;
     let bottomPosition = 40;
 
-    if (selectedType === 'INFIDELI') {
+    if (selectedType === 'NIGHT') {
       topPosition = 100;
       bottomPosition = 0;
     }
 
-    if (selectedType === 'FIDELI') {
+    if (selectedType === 'DAY') {
       topPosition = 0;
       bottomPosition = 100;
     }
 
-    if (hoveredPath === 'INFIDELI' && !selectedType) {
+    if (hoveredPath === 'NIGHT' && !selectedType) {
       topPosition = 80;
       bottomPosition = 20;
     }
 
-    if (hoveredPath === 'FIDELI' && !selectedType) {
+    if (hoveredPath === 'DAY' && !selectedType) {
       topPosition = 40;
       bottomPosition = 60;
     }

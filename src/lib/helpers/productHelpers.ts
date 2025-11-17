@@ -338,7 +338,7 @@ export async function updateProductImages(
 
   } catch (error) {
     if (uploadedImagePaths.length > 0) {
-      const bucketName = process.env.SUPABASE_BUCKET || 'infideli-images';
+      const bucketName = process.env.SUPABASE_BUCKET || 'noire';
       await Promise.allSettled(
         uploadedImagePaths.map(path => 
           supabase.storage.from(bucketName).remove([path])

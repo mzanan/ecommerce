@@ -2,7 +2,7 @@ import { createServerActionClient } from "@/lib/supabase/server";
 import { v4 as uuidv4 } from 'uuid';
 import { optimizeImageFile, optimizeVideoFile } from '@/lib/helpers/mediaOptimization';
 
-const BUCKET_NAME = process.env.SUPABASE_BUCKET || 'infideli-images';
+const BUCKET_NAME = process.env.SUPABASE_BUCKET || 'noire';
 
 export async function uploadProductImage(file: File): Promise<{ publicUrl: string | null, path: string | null, error: string | null }> {
     const supabase = createServerActionClient();
@@ -35,7 +35,7 @@ export async function uploadProductImage(file: File): Promise<{ publicUrl: strin
 
 export async function deleteProductImage(imageUrl: string): Promise<{ success: boolean, error: string | null }> {
     const supabase = createServerActionClient();
-    const bucketName = process.env.NEXT_PUBLIC_SUPABASE_BUCKET_NAME || 'infideli-images';
+    const bucketName = process.env.NEXT_PUBLIC_SUPABASE_BUCKET_NAME || 'noire';
 
     try {
         const url = new URL(imageUrl);

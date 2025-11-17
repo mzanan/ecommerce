@@ -1,29 +1,67 @@
-import { SOCIAL_LINKS, CONTACT_INFO, COMPANY_INFO } from '@/lib/constants/social';
+import type { Metadata } from 'next';
 
 export const seoConfig = {
-  siteName: COMPANY_INFO.NAME,
-  siteUrl: process.env.NEXT_PUBLIC_APP_URL,
-  defaultTitle: 'Infideli - Luxury Lingerie Collections',
-  defaultDescription: 'Luxury lingerie collections featuring elegant FIDELI and seductive INFIDELI sets. Premium quality intimate apparel for the modern woman.',
-  defaultKeywords: ['luxury lingerie', 'intimate apparel', 'fideli', 'infideli', 'premium underwear', 'women lingerie'],
-  defaultImage: '/images/og-default.jpg',
-  twitterHandle: COMPANY_INFO.TWITTER_HANDLE,
-  
+  siteName: 'Noire',
+  siteUrl: process.env.NEXT_PUBLIC_APP_URL || 'https://noire.com',
+  defaultTitle: 'Noire - Urban Streetwear',
+  defaultDescription: 'Modern streetwear collections featuring day and night styles. Premium quality urban fashion.',
+  defaultKeywords: ['streetwear', 'urban fashion', 'modern clothing', 'day collection', 'night collection'] as string[],
+  defaultImage: '/og-image.png',
+  twitterHandle: '@noire',
+  locale: 'en_US',
   organization: {
-    name: COMPANY_INFO.NAME,
-    url: process.env.NEXT_PUBLIC_APP_URL,
-    logo: '/images/logo.png',
-    description: COMPANY_INFO.DESCRIPTION,
+    name: 'Noire',
+    url: process.env.NEXT_PUBLIC_APP_URL || 'https://noire.com',
+    logo: '/logo.png',
+    description: 'Modern urban streetwear featuring day and night collections.',
     contactPoint: {
-      telephone: CONTACT_INFO.PHONE,
-      contactType: 'customer service',
-      email: CONTACT_INFO.EMAIL
+      telephone: '+1-555-0123',
+      contactType: 'Customer Service',
+      email: 'contact@noire.com',
     },
     sameAs: [
-      SOCIAL_LINKS.INSTAGRAM,
-      SOCIAL_LINKS.FACEBOOK,
-      SOCIAL_LINKS.TWITTER
-    ]
+      'https://facebook.com/noire',
+      'https://instagram.com/noire',
+      'https://twitter.com/noire',
+    ],
+  },
+} as const;
+
+export const baseMetadata: Metadata = {
+  title: {
+    default: seoConfig.defaultTitle,
+    template: `%s | ${seoConfig.siteName}`,
+  },
+  description: seoConfig.defaultDescription,
+  keywords: seoConfig.defaultKeywords,
+  authors: [{ name: seoConfig.siteName }],
+  creator: seoConfig.siteName,
+  metadataBase: new URL(seoConfig.siteUrl),
+  
+  openGraph: {
+    type: 'website',
+    locale: seoConfig.locale,
+    url: seoConfig.siteUrl,
+    title: seoConfig.defaultTitle,
+    description: seoConfig.defaultDescription,
+    siteName: seoConfig.siteName,
+    images: [
+      {
+        url: seoConfig.defaultImage,
+        width: 1200,
+        height: 630,
+        alt: seoConfig.siteName,
+      },
+    ],
+  },
+  
+  twitter: {
+    card: 'summary_large_image',
+    title: seoConfig.defaultTitle,
+    description: seoConfig.defaultDescription,
+    site: seoConfig.twitterHandle,
+    creator: seoConfig.twitterHandle,
+    images: [seoConfig.defaultImage],
   },
   
   robots: {
@@ -37,6 +75,4 @@ export const seoConfig = {
       'max-snippet': -1,
     },
   },
-} as const;
-
-export type SEOConfig = typeof seoConfig; 
+};

@@ -2,7 +2,7 @@ import { StateCreator } from 'zustand';
 import type { Store, SetType, HomeTypeSlice } from '@/types/store';
 
 const SESSION_STORAGE_KEY = 'homeSelectedType';
-const DEFAULT_TYPE: SetType = 'FIDELI';
+const DEFAULT_TYPE: SetType = 'DAY';
 
 export const createHomeTypeSlice: StateCreator<
   Store,
@@ -26,13 +26,13 @@ export const createHomeTypeSlice: StateCreator<
       try {
         const storedType = localStorage.getItem(SESSION_STORAGE_KEY) as SetType;
         
-        if (storedType === 'FIDELI' || storedType === 'INFIDELI') {
+        if (storedType === 'DAY' || storedType === 'NIGHT') {
           if (storedType !== get().selectedHomeType) {
             set({ selectedHomeType: storedType });
           }
         } else {
-          set({ selectedHomeType: 'FIDELI' });
-          localStorage.setItem(SESSION_STORAGE_KEY, 'FIDELI');
+          set({ selectedHomeType: 'DAY' });
+          localStorage.setItem(SESSION_STORAGE_KEY, 'DAY');
         }
       } catch (error) {
         console.error("Error reading from localStorage:", error);

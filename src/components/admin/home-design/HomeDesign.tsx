@@ -16,8 +16,8 @@ import { Loader2 } from 'lucide-react';
 
 export default function HomeDesign() {
     const {
-        fideliList,
-        infideliList,
+        dayList,
+        nightList,
         staticSections,
         isCreatingComponent,
         newComponentTitle,
@@ -69,15 +69,15 @@ export default function HomeDesign() {
                     />
                     <Select 
                         value={newComponentAffiliation}
-                        onValueChange={(value) => setNewComponentAffiliation(value as 'FIDELI' | 'INFIDELI')}
+                        onValueChange={(value) => setNewComponentAffiliation(value as 'DAY' | 'NIGHT')}
                         disabled={isCreatingComponent}
                     >
                         <SelectTrigger>
                             <SelectValue placeholder="Select type" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="FIDELI">White</SelectItem>
-                            <SelectItem value="INFIDELI">Black</SelectItem>
+                            <SelectItem value="DAY">Day</SelectItem>
+                            <SelectItem value="NIGHT">Night</SelectItem>
                         </SelectContent>
                     </Select>
                     <div className="flex justify-end">
@@ -121,15 +121,15 @@ export default function HomeDesign() {
             >
                 <div className="space-y-10">
                     <section className="p-6 border rounded-md shadow-sm bg-card">
-                        <h2 className="text-2xl font-semibold mb-4 border-b pb-2">White Section</h2>
-                        <SortableContext items={fideliList} strategy={verticalListSortingStrategy}>
+                        <h2 className="text-2xl font-semibold mb-4 border-b pb-2">Day Section</h2>
+                        <SortableContext items={dayList} strategy={verticalListSortingStrategy}>
                             <div className="space-y-3 min-h-[50px]">
                                 {isSectionContentLoading ? (
                                     <div className="flex items-center justify-center py-12">
                                         <Loader2 className="h-8 w-8 animate-spin text-primary" />
                                     </div>
-                                ) : fideliList.length > 0 ? (
-                                    fideliList.map(item => (
+                                ) : dayList.length > 0 ? (
+                                    dayList.map(item => (
                                         <SortableItem 
                                             key={item.id} 
                                             item={item} 
@@ -139,22 +139,22 @@ export default function HomeDesign() {
                                         />
                                     ))
                                 ) : (
-                                    <p className="text-muted-foreground text-center py-4">No White items yet.</p>
+                                    <p className="text-muted-foreground text-center py-4">No Day items yet.</p>
                                 )}
                             </div>
                         </SortableContext>
                     </section>
 
                     <section className="p-6 border rounded-md shadow-sm bg-card">
-                        <h2 className="text-2xl font-semibold mb-4 border-b pb-2">Black Section</h2>
-                        <SortableContext items={infideliList} strategy={verticalListSortingStrategy}>
+                        <h2 className="text-2xl font-semibold mb-4 border-b pb-2">Night Section</h2>
+                        <SortableContext items={nightList} strategy={verticalListSortingStrategy}>
                              <div className="space-y-3 min-h-[50px]">
                                 {isSectionContentLoading ? (
                                     <div className="flex items-center justify-center py-12">
                                         <Loader2 className="h-8 w-8 animate-spin text-primary" />
                                     </div>
-                                ) : infideliList.length > 0 ? (
-                                    infideliList.map(item => (
+                                ) : nightList.length > 0 ? (
+                                    nightList.map(item => (
                                         <SortableItem 
                                             key={item.id} 
                                             item={item} 
@@ -164,7 +164,7 @@ export default function HomeDesign() {
                                         />
                                     ))
                                 ) : (
-                                    <p className="text-muted-foreground text-center py-4">No Black items yet.</p>
+                                    <p className="text-muted-foreground text-center py-4">No Night items yet.</p>
                                 )}
                             </div>
                         </SortableContext>

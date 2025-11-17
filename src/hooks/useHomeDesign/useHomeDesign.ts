@@ -24,20 +24,20 @@ import { homeLayoutQueryKeys } from '@/lib/queries/homeDesignQueries';
 export function useHomeDesign(pagePath: string = '/') {
     const { data: layoutData, isLoading: isLayoutLoading, error: layoutError, refetch: refetchLayout } = useHomeLayoutData(pagePath);
     
-    const [fideliList, setFideliList] = useState<SortableListItem[]>([]);
-    const [infideliList, setInfideliList] = useState<SortableListItem[]>([]);
+    const [dayList, setDayList] = useState<SortableListItem[]>([]);
+    const [nightList, setNightList] = useState<SortableListItem[]>([]);
     const [isProcessingLayout, setIsProcessingLayout] = useState(false);
     const [renderKey, setRenderKey] = useState(Date.now());
     const [newComponentTitle, setNewComponentTitle] = useState('');
     const [newComponentText, setNewComponentText] = useState('');
     const [editingItem, setEditingItem] = useState<SortableListItem | null>(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [newComponentAffiliation, setNewComponentAffiliation] = useState<'FIDELI' | 'INFIDELI' | '' | undefined>('');
+    const [newComponentAffiliation, setNewComponentAffiliation] = useState<'DAY' | 'NIGHT' | '' | undefined>('');
 
     const processLayoutData = useCallback(async (rawLayoutData: any[]) => {
         if (!rawLayoutData || rawLayoutData.length === 0) {
-            setFideliList([]);
-            setInfideliList([]);
+            setDayList([]);
+            setNightList([]);
             return;
         }
 
@@ -68,8 +68,8 @@ export function useHomeDesign(pagePath: string = '/') {
         const componentMap = new Map(fetchedComponents.map(c => [c.id, c]));
         const setMap = new Map(fetchedSets.map(s => [s.id, s]));
 
-        const tempFideliList: SortableListItem[] = [];
-        const tempInfideliList: SortableListItem[] = [];
+        const tempDayList: SortableListItem[] = [];
+        const tempNightList: SortableListItem[] = [];
 
         rawLayoutData.forEach((layoutItem: any) => {
             if (layoutItem.item_type === 'page_component') {
@@ -80,10 +80,10 @@ export function useHomeDesign(pagePath: string = '/') {
                         item_type: 'page_component', 
                         display_order: layoutItem.display_order 
                     };
-                    if (component.affiliation === 'FIDELI') {
-                        tempFideliList.push(sortablePageItem);
-                    } else if (component.affiliation === 'INFIDELI') {
-                        tempInfideliList.push(sortablePageItem);
+                    if (component.affiliation === 'DAY') {
+                        tempDayList.push(sortablePageItem);
+                    } else if (component.affiliation === 'NIGHT') {
+                        tempNightList.push(sortablePageItem);
                     }
                 }
             } else if (layoutItem.item_type === 'set') {
@@ -97,17 +97,17 @@ export function useHomeDesign(pagePath: string = '/') {
                         type: set.type 
                     };
                     
-                    if (upperCaseType === 'FIDELI' || upperCaseType === 'WHITE') {
-                        tempFideliList.push(sortableSetItem);
-                    } else if (upperCaseType === 'INFIDELI' || upperCaseType === 'BLACK') {
-                        tempInfideliList.push(sortableSetItem);
+                    if (upperCaseType === 'DAY' || upperCaseType === 'WHITE') {
+                        tempDayList.push(sortableSetItem);
+                    } else if (upperCaseType === 'NIGHT' || upperCaseType === 'BLACK') {
+                        tempNightList.push(sortableSetItem);
                     } 
                 }
             }
         });
 
-        setFideliList(tempFideliList);
-        setInfideliList(tempInfideliList);
+        setDayList(tempDayList);
+        setNightList(tempNightList);
         setRenderKey(Date.now());
     }, []);
 
@@ -118,8 +118,8 @@ export function useHomeDesign(pagePath: string = '/') {
                 setIsProcessingLayout(false);
             });
         } else if (!isLayoutLoading) {
-             setFideliList([]);
-             setInfideliList([]);
+             setDayList([]);
+             setNightList([]);
         }
     }, [layoutData, isLayoutLoading, processLayoutData]);
 
@@ -137,14 +137,14 @@ export function useHomeDesign(pagePath: string = '/') {
 
     const handleDragEnd = useCallback(
         createDragEndHandler(
-            fideliList,
-            infideliList,
-            setFideliList,
-            setInfideliList,
+            dayList,
+            nightList,
+            setDayList,
+            setNightList,
             pagePath,
             updateLayoutOrderMutation
         ),
-        [fideliList, infideliList, pagePath, updateLayoutOrderMutation]
+        [dayList, nightList, pagePath, updateLayoutOrderMutation]
     );
 
     const handleCreateComponent = async (event: React.FormEvent) => {
@@ -169,10 +169,10 @@ export function useHomeDesign(pagePath: string = '/') {
         };
 
         const listUpdater = (list: SortableListItem[]) => [...list, newSortableItem];
-        if (newComponent.affiliation === 'FIDELI') {
-            setFideliList(listUpdater);
+        if (newComponent.affiliation === 'DAY') {
+            setDayList(listUpdater);
         } else {
-            setInfideliList(listUpdater);
+            setNightList(listUpdater);
         }
 
         setNewComponentTitle('');
@@ -190,8 +190,8 @@ export function useHomeDesign(pagePath: string = '/') {
         });
 
         const listFilter = (list: SortableListItem[]) => list.filter(item => item.id !== itemIdToDelete);
-        setFideliList(listFilter);
-        setInfideliList(listFilter);
+        setDayList(listFilter);
+        setNightList(listFilter);
 
         if (editingItem && editingItem.id === itemIdToDelete) {
             closeEditModal();
@@ -237,19 +237,19 @@ export function useHomeDesign(pagePath: string = '/') {
             const oldAffiliation = editingItem.item_type === 'page_component' ? editingItem.affiliation : editingItem.type?.toUpperCase();
             const newAffiliation = 'affiliation' in itemToUpdate ? itemToUpdate.affiliation : ('type' in itemToUpdate && itemToUpdate.type ? itemToUpdate.type.toUpperCase() : undefined);
 
-            const wasFideli = oldAffiliation === 'FIDELI' || oldAffiliation === 'WHITE';
-            const isFideli = newAffiliation === 'FIDELI' || newAffiliation === 'WHITE';
+            const wasDay = oldAffiliation === 'DAY' || oldAffiliation === 'WHITE';
+            const isDay = newAffiliation === 'DAY' || newAffiliation === 'WHITE';
 
-            if (wasFideli !== isFideli) {
-                if (wasFideli) setFideliList(prev => prev.filter(item => item.id !== itemToUpdate.id));
-                else setInfideliList(prev => prev.filter(item => item.id !== itemToUpdate.id));
+            if (wasDay !== isDay) {
+                if (wasDay) setDayList(prev => prev.filter(item => item.id !== itemToUpdate.id));
+                else setNightList(prev => prev.filter(item => item.id !== itemToUpdate.id));
 
-                if (isFideli) setFideliList(prev => [...prev, itemToUpdate]);
-                else setInfideliList(prev => [...prev, itemToUpdate]);
+                if (isDay) setDayList(prev => [...prev, itemToUpdate]);
+                else setNightList(prev => [...prev, itemToUpdate]);
             } else {
                 const listUpdater = (list: SortableListItem[]) => list.map(item => item.id === itemToUpdate.id ? itemToUpdate : item);
-                if (isFideli) setFideliList(listUpdater);
-                else setInfideliList(listUpdater);
+                if (isDay) setDayList(listUpdater);
+                else setNightList(listUpdater);
             }
         }
         
@@ -267,12 +267,12 @@ export function useHomeDesign(pagePath: string = '/') {
         setEditingItem(null);
     };
 
-    const calculatedLoading = (isLayoutLoading && fideliList.length === 0 && infideliList.length === 0) || createPageComponentMutation.isPending || updateLayoutOrderMutation.isPending || deleteItemMutation.isPending || updatePageComponentContentMutation.isPending || updateSetContentMutation.isPending;
+    const calculatedLoading = (isLayoutLoading && dayList.length === 0 && nightList.length === 0) || createPageComponentMutation.isPending || updateLayoutOrderMutation.isPending || deleteItemMutation.isPending || updatePageComponentContentMutation.isPending || updateSetContentMutation.isPending;
     const isSectionContentLoading = isLayoutLoading || isProcessingLayout;
     
     return {
-        fideliList,
-        infideliList,
+        dayList,
+        nightList,
         staticSections,
         loading: calculatedLoading,
         isSectionContentLoading,

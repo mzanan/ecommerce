@@ -5,7 +5,7 @@ import { generateMetadata } from '@/lib/utils/seo';
 
 export const metadata = generateMetadata({
   title: 'Sets',
-  description: 'Manage Infideli product sets and collections.',
+  description: 'Manage Noire product sets and collections.',
   noIndex: true,
 });
 

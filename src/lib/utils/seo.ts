@@ -16,7 +16,7 @@ export function generateMetadata(config: SEOConfig): Metadata {
   const url = config.canonicalUrl ? `${seoConfig.siteUrl}${config.canonicalUrl}` : seoConfig.siteUrl
   const image = config.image || `${seoConfig.siteUrl}${seoConfig.defaultImage}`
   
-  const titlePrefix = config.noIndex ? 'Infideli Admin' : seoConfig.siteName
+  const titlePrefix = config.noIndex ? 'Noire Admin' : seoConfig.siteName
 
   return {
     title,
@@ -56,139 +56,124 @@ export function generateMetadata(config: SEOConfig): Metadata {
 export const seoConfigs = {
   home: {
     title: 'Home',
-    description: 'Discover Infideli\'s luxury lingerie collections. Elegant FIDELI and seductive INFIDELI sets crafted with premium materials for the modern woman.',
-    keywords: ['luxury lingerie', 'intimate apparel', 'fideli', 'infideli', 'premium underwear', 'women lingerie'],
+    description: 'Discover Noire\'s urban streetwear collections. Modern day and night styles for the contemporary wardrobe.',
+    keywords: ['streetwear', 'urban fashion', 'day collection', 'night collection', 'modern clothing'],
     canonicalUrl: '/',
   },
   
   admin: {
     title: 'Admin Dashboard',
-    description: 'Infideli administration panel for managing products, orders, and content.',
+    description: 'Noire administration panel for managing products, orders, and content.',
     noIndex: true,
   },
   
   adminDashboard: {
     title: 'Dashboard',
-    description: 'Infideli admin dashboard with analytics and overview.',
+    description: 'Noire admin dashboard with analytics and overview.',
     noIndex: true,
   },
   
   adminProducts: {
     title: 'Products',
-    description: 'Manage Infideli products and inventory.',
+    description: 'Manage Noire products and inventory.',
     noIndex: true,
   },
   
   adminSets: {
     title: 'Sets',
-    description: 'Manage Infideli product sets and collections.',
+    description: 'Manage Noire product sets and collections.',
     noIndex: true,
   },
   
   adminOrders: {
     title: 'Orders',
-    description: 'Manage customer orders and shipping.',
-    noIndex: true,
-  },
-  
-  adminCategories: {
-    title: 'Categories',
-    description: 'Manage product categories and classifications.',
+    description: 'View and manage customer orders.',
     noIndex: true,
   },
   
   adminSettings: {
     title: 'Settings',
-    description: 'Configure Infideli application settings.',
+    description: 'Configure Noire application settings.',
     noIndex: true,
   },
   
   cart: {
     title: 'Shopping Cart',
-    description: 'Review your selected Infideli lingerie items before checkout.',
-    keywords: ['shopping cart', 'checkout', 'lingerie purchase'],
+    description: 'Review your selected Noire items before checkout.',
     canonicalUrl: '/cart',
   },
   
   checkout: {
     title: 'Checkout',
-    description: 'Complete your Infideli lingerie purchase with secure payment.',
-    keywords: ['checkout', 'payment', 'secure purchase'],
-    canonicalUrl: '/checkout',
+    description: 'Complete your Noire purchase with secure payment.',
     noIndex: true,
   },
   
   contact: {
     title: 'Contact Us',
-    description: 'Get in touch with Infideli for questions about our luxury lingerie collections.',
-    keywords: ['contact', 'customer service', 'support'],
+    description: 'Get in touch with Noire for questions about our collections.',
     canonicalUrl: '/contact',
   },
   
   about: {
-    title: 'About Us',
-    description: 'Learn about Infideli\'s story and commitment to luxury intimate apparel.',
-    keywords: ['about infideli', 'luxury lingerie brand', 'company story'],
+    title: 'About',
+    description: 'Learn about Noire\'s story and commitment to modern urban fashion.',
+    keywords: ['about noire', 'streetwear brand', 'company story'],
     canonicalUrl: '/about',
   },
   
   privacy: {
     title: 'Privacy Policy',
-    description: 'Infideli\'s privacy policy and data protection practices.',
+    description: 'Noire\'s privacy policy and data protection practices.',
     canonicalUrl: '/privacy',
   },
   
   terms: {
-    title: 'Terms of Service',
-    description: 'Terms and conditions for using Infideli\'s website and services.',
+    title: 'Terms & Conditions',
+    description: 'Terms and conditions for using Noire\'s website and services.',
     canonicalUrl: '/terms',
   },
 }
 
 export function generateSetMetadata(setData: {
   name: string
-  description?: string
-  slug: string
-  type?: 'FIDELI' | 'INFIDELI'
-  images?: Array<{ image_url: string; alt_text?: string }>
-}): Metadata {
-  const brandName = setData.type || 'Infideli'
-  const title = setData.name
-  const description = setData.description || `Discover the ${setData.name} collection from ${brandName}. Luxury lingerie crafted with premium materials and elegant design.`
-  const image = setData.images?.[0]?.image_url || `${seoConfig.siteUrl}${seoConfig.defaultImage}`
-  
+  description?: string | null
+  type?: 'DAY' | 'NIGHT'
+  imageUrl?: string
+}) {
+  const brandName = setData.type || 'Noire'
+  const keywords = [
+    'urban fashion',
+    'streetwear',
+    setData.type?.toLowerCase() || 'collection',
+    setData.name.toLowerCase(),
+  ]
+
   return generateMetadata({
-    title,
-    description,
-    keywords: ['lingerie set', setData.name.toLowerCase(), brandName.toLowerCase(), 'luxury intimate apparel'],
-    canonicalUrl: `/set/${setData.slug}`,
-    image,
+    title: setData.name,
+    description: setData.description || `${setData.name} - Premium ${brandName} collection from Noire. Modern urban fashion.`,
+    keywords,
+    image: setData.imageUrl,
   })
 }
 
 export function generateProductMetadata(productData: {
   name: string
-  description?: string
-  slug: string
   price: number
-  category?: { name: string }
-  images?: Array<{ image_url: string; alt_text?: string }>
-}): Metadata {
-  const title = productData.name
-  const description = productData.description || `${productData.name} - Premium lingerie piece from Infideli. High-quality intimate apparel starting at $${productData.price}.`
-  const image = productData.images?.[0]?.image_url || `${seoConfig.siteUrl}${seoConfig.defaultImage}`
-  
+  description?: string | null
+  imageUrl?: string
+}) {
+  const description = productData.description || `${productData.name} - Premium fashion piece from Noire. High-quality urban wear starting at $${productData.price}.`
+  const keywords = [
+    'urban fashion',
+    'streetwear',
+    productData.name.toLowerCase(),
+  ]
+
   return generateMetadata({
-    title,
+    title: productData.name,
     description,
-    keywords: [
-      'lingerie',
-      productData.name.toLowerCase(),
-      productData.category?.name.toLowerCase() || '',
-      'luxury underwear',
-      'intimate apparel'
-    ].filter(Boolean),
-    canonicalUrl: `/product/${productData.slug}`,
-    image,
+    keywords,
+    image: productData.imageUrl,
   })
-} 
+}

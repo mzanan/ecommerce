@@ -153,7 +153,7 @@ export default function SetDisplay({ set }: SetDisplayProps) {
   }, [carouselApi, focusedProductImage]);
 
   useEffect(() => {
-    if (set.type === 'INFIDELI') {
+    if (set.type === 'NIGHT') {
       setTheme('dark');
     } else {
       setTheme('light');

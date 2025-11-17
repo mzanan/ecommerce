@@ -1,4 +1,4 @@
-export type SetType = 'FIDELI' | 'INFIDELI';
+export type SetType = 'DAY' | 'NIGHT';
 export type HomeType = SetType;
 
 export interface CartItem {

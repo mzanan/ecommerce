@@ -30,12 +30,12 @@ const PathSelector = forwardRef<HTMLElement, PathSelectorProps>((
 
   const { topPosition, bottomPosition } = getDiagonalPosition();
 
-  const handleFideliClick = () => {
-    onSelectType('FIDELI');
+  const handleDayClick = () => {
+    onSelectType('DAY');
   };
 
-  const handleInfideliClick = () => {
-    onSelectType('INFIDELI');
+  const handleNightClick = () => {
+    onSelectType('NIGHT');
   };
 
   return (
@@ -57,14 +57,14 @@ const PathSelector = forwardRef<HTMLElement, PathSelectorProps>((
           maxWidth: '100vw',
           overflow: 'hidden'
         }}
-        onClick={handleFideliClick}
-        onMouseEnter={() => setHoveredPath('FIDELI')}
+        onClick={handleDayClick}
+        onMouseEnter={() => setHoveredPath('DAY')}
         onMouseLeave={() => setHoveredPath(null)}
       >
         <div className="ml-[20%] lg:ml-[33%]">
           <AnimatedWord 
             word="Day" 
-            onClick={handleFideliClick}
+            onClick={handleDayClick}
             className="text-4xl md:text-7xl lg:text-8xl font-medium text-gray-800 font-['Cormorant_Garamond'] mb-4 w-full"
             hoverColor="silver"
           />
@@ -78,14 +78,14 @@ const PathSelector = forwardRef<HTMLElement, PathSelectorProps>((
           maxWidth: '100vw',
           overflow: 'hidden'
         }}
-        onClick={handleInfideliClick}
-        onMouseEnter={() => setHoveredPath('INFIDELI')}
+        onClick={handleNightClick}
+        onMouseEnter={() => setHoveredPath('NIGHT')}
         onMouseLeave={() => setHoveredPath(null)}
       >
         <div className="mr-[20%] lg:mr-[33%]">
           <AnimatedWord
             word="Night"
-            onClick={handleInfideliClick}
+            onClick={handleNightClick}
             className="text-4xl md:text-7xl lg:text-8xl font-medium text-white font-['Great_Vibes'] mb-4 italic"
             hoverColor="red"
           />

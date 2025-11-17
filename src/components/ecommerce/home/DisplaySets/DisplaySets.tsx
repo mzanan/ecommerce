@@ -13,8 +13,8 @@ import { useSnapClasses } from '@/hooks/useSnapClasses';
 
 interface DisplaySetsProps {
   homepageItems: (PageComponent & { item_type: 'page_component' } | SetRow & { item_type: 'set' })[];
-  primaryType: 'FIDELI' | 'INFIDELI' | null;
-  secondaryType: 'FIDELI' | 'INFIDELI';
+  primaryType: 'DAY' | 'NIGHT' | null;
+  secondaryType: 'DAY' | 'NIGHT';
   setsAnimationProgress: MotionValue<number>;
   titleVisibilityProgress: MotionValue<number>;
   isIosDevice?: boolean;
@@ -23,7 +23,7 @@ interface DisplaySetsProps {
 const AnimatedSetRenderer: React.FC<{ 
   set: SetRow; 
   isHomepageContext: boolean; 
-  type: 'FIDELI' | 'INFIDELI';
+  type: 'DAY' | 'NIGHT';
   index: number;
 }> = ({ set, isHomepageContext }) => {
   
@@ -85,8 +85,8 @@ export default function DisplaySets({
 }: DisplaySetsProps) {
   const { getSnapClasses } = useSnapClasses({ isIosDevice });
 
-  const getTypeSpecificClasses = (type: 'FIDELI' | 'INFIDELI', _isPrimary: boolean) => {
-    const classes = type === 'FIDELI' ? 'text-black' : 'bg-black text-white';
+  const getTypeSpecificClasses = (type: 'DAY' | 'NIGHT', _isPrimary: boolean) => {
+    const classes = type === 'DAY' ? 'text-black' : 'bg-black text-white';
     return classes;
   };
 
@@ -129,12 +129,12 @@ export default function DisplaySets({
           <div className={`${getTypeSpecificClasses(primaryType, true)} p-8 md:p-12`}>
             <div className="text-center w-full mb-8">
               <h2 className="text-3xl font-bold tracking-tight mb-2">
-                {primaryType === 'FIDELI' ? 'White' : 'Black'} Sets
+                {primaryType === 'DAY' ? 'Day' : 'Night'} Collection
               </h2>
               <p className="text-lg text-muted-foreground mx-auto">
-                {primaryType === 'FIDELI'
-                  ? 'Discover comfort and elegance for every day.'
-                  : 'Explore seductive designs for special moments.'
+                {primaryType === 'DAY'
+                  ? 'Discover comfort and style for your everyday wardrobe.'
+                  : 'Explore bold designs for memorable evenings.'
                 }
               </p>
             </div>

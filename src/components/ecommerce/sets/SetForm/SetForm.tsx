@@ -185,18 +185,18 @@ export const SetForm = ({ set }: SetFormProps) => {
                 >
                   <FormItem className="flex items-center space-x-3 space-y-0">
                     <FormControl>
-                      <RadioGroupItem value="FIDELI" id="type-fideli" />
+                      <RadioGroupItem value="DAY" id="type-day" />
                     </FormControl>
-                    <FormLabel htmlFor="type-fideli" className="font-normal">
-                      White
+                    <FormLabel htmlFor="type-day" className="font-normal">
+                      Day
                     </FormLabel>
                   </FormItem>
                   <FormItem className="flex items-center space-x-3 space-y-0">
                     <FormControl>
-                      <RadioGroupItem value="INFIDELI" id="type-infideli" />
+                      <RadioGroupItem value="NIGHT" id="type-night" />
                     </FormControl>
-                    <FormLabel htmlFor="type-infideli" className="font-normal">
-                      Black
+                    <FormLabel htmlFor="type-night" className="font-normal">
+                      Night
                     </FormLabel>
                   </FormItem>
                 </RadioGroup>

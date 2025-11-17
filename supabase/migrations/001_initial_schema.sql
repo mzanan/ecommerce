@@ -96,7 +96,7 @@ CREATE TABLE sets (
   slug TEXT NOT NULL UNIQUE,
   description TEXT,
   is_active BOOLEAN DEFAULT true NOT NULL,
-  type TEXT CHECK (type = ANY (ARRAY['FIDELI'::text, 'INFIDELI'::text])),
+  type TEXT CHECK (type = ANY (ARRAY['DAY'::text, 'NIGHT'::text])),
   layout_type TEXT CHECK (layout_type = ANY (ARRAY['SINGLE_COLUMN'::text, 'SPLIT_SMALL_LEFT'::text, 'SPLIT_SMALL_RIGHT'::text, 'STAGGERED_THREE'::text, 'TWO_HORIZONTAL'::text])),
   show_title_on_home BOOLEAN DEFAULT true,
   total_price DECIMAL(10,2) DEFAULT 0,
@@ -184,7 +184,7 @@ CREATE TABLE page_components (
   page_path TEXT DEFAULT '/' NOT NULL,
   is_active BOOLEAN DEFAULT true NOT NULL,
   display_order INTEGER,
-  affiliation TEXT NOT NULL CHECK (affiliation = ANY (ARRAY['FIDELI'::text, 'INFIDELI'::text])),
+  affiliation TEXT NOT NULL CHECK (affiliation = ANY (ARRAY['DAY'::text, 'NIGHT'::text])),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

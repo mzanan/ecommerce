@@ -68,7 +68,7 @@ export const useCacheStore = create<CacheStore>()(
       },
     }),
     {
-      name: 'infideli-cache',
+      name: 'noire-cache',
       partialize: (state) => ({ cache: state.cache }),
     }
   )

@@ -2,10 +2,10 @@ import Stripe from 'npm:stripe@^15.0.0';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const COMPANY_INFO = {
-  NAME: 'Infideli',
-  WEBSITE_URL: Deno.env.get('NEXT_PUBLIC_APP_URL') || 'https://infideli.com',
-  SUPPORT_EMAIL: 'support@infideli.com',
-  CONTACT_EMAIL: 'contact@infideli.com',
+  NAME: 'Noire',
+  WEBSITE_URL: Deno.env.get('NEXT_PUBLIC_APP_URL') || 'https://noire.com',
+  SUPPORT_EMAIL: 'support@noire.com',
+  CONTACT_EMAIL: 'contact@noire.com',
 } as const;
 
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY')!, {

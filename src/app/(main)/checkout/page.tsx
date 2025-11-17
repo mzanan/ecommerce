@@ -6,7 +6,7 @@ export const revalidate = 900;
 
 export const metadata = generateMetadata({
   title: 'Checkout',
-  description: 'Complete your Infideli lingerie purchase with secure payment.',
+  description: 'Complete your Noire lingerie purchase with secure payment.',
   keywords: ['checkout', 'payment', 'secure purchase'],
   canonicalUrl: '/checkout',
   noIndex: true,

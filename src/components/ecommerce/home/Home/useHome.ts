@@ -91,7 +91,7 @@ export function useHome(homepageItemsData: HomePageItemOrchestrator[], scrollCon
       if (pathSelectorElement && selectedType === null) {
         const rect = pathSelectorElement.getBoundingClientRect();
         if (rect.bottom < window.innerHeight * 0.2) {
-          setSelectedType("FIDELI");
+          setSelectedType("DAY");
           setHasScrolledPastSelector(true);
         }
       }
@@ -126,8 +126,8 @@ export function useHome(homepageItemsData: HomePageItemOrchestrator[], scrollCon
       const timeoutId = setTimeout(() => {
         isScrollingProgrammatically.current = true;
 
-        const effectiveSelectedType = selectedType || "FIDELI";
-        const targetSection = effectiveSelectedType === "FIDELI" ? whiteSectionRef.current : blackSectionRef.current;
+        const effectiveSelectedType = selectedType || "DAY";
+        const targetSection = effectiveSelectedType === "DAY" ? whiteSectionRef.current : blackSectionRef.current;
 
         if (targetSection && scrollContainerRef.current) {
           const containerRect = scrollContainerRef.current.getBoundingClientRect();
@@ -184,7 +184,7 @@ export function useHome(homepageItemsData: HomePageItemOrchestrator[], scrollCon
     [homepageItemsData]
   );
 
-  const effectiveSelectedType = selectedType || "FIDELI";
+  const effectiveSelectedType = selectedType || "DAY";
 
   return {
     selectedType,

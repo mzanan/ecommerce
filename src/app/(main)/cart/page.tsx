@@ -6,7 +6,7 @@ export const revalidate = 1800;
 
 export const metadata = generateMetadata({
   title: 'Shopping Cart',
-  description: 'Review your selected Infideli lingerie items before checkout.',
+  description: 'Review your selected Noire lingerie items before checkout.',
   keywords: ['shopping cart', 'checkout', 'lingerie purchase'],
   canonicalUrl: '/cart',
 });

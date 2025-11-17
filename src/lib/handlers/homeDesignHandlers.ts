@@ -12,10 +12,10 @@ export interface LayoutUpdateItemArgs {
 }
 
 export function createDragEndHandler(
-  fideliList: SortableListItem[],
-  infideliList: SortableListItem[],
-  setFideliList: React.Dispatch<React.SetStateAction<SortableListItem[]>>,
-  setInfideliList: React.Dispatch<React.SetStateAction<SortableListItem[]>>,
+  dayList: SortableListItem[],
+  nightList: SortableListItem[],
+  setDayList: React.Dispatch<React.SetStateAction<SortableListItem[]>>,
+  setNightList: React.Dispatch<React.SetStateAction<SortableListItem[]>>,
   pagePath: string,
   updateLayoutOrderMutation: any
 ) {
@@ -28,11 +28,11 @@ export function createDragEndHandler(
     
     let listChanged = false;
     let updatedListState: SortableListItem[] | undefined = undefined;
-    let listType: 'fideli' | 'infideli' | undefined;
+    let listType: 'day' | 'night' | undefined;
     
-    if (fideliList.some(p => p.id === activeId)) {
-      listType = 'fideli';
-      setFideliList(items => {
+    if (dayList.some(p => p.id === activeId)) {
+      listType = 'day';
+      setDayList(items => {
         const oldIndex = items.findIndex(item => item.id === activeId);
         const newIndex = items.findIndex(item => item.id === overId);
         if (oldIndex === -1 || newIndex === -1 || oldIndex === newIndex) return items;
@@ -40,9 +40,9 @@ export function createDragEndHandler(
         updatedListState = arrayMove(items, oldIndex, newIndex);
         return updatedListState;
       });
-    } else if (infideliList.some(s => s.id === activeId)) {
-      listType = 'infideli';
-      setInfideliList(items => {
+    } else if (nightList.some(s => s.id === activeId)) {
+      listType = 'night';
+      setNightList(items => {
         const oldIndex = items.findIndex(item => item.id === activeId);
         const newIndex = items.findIndex(item => item.id === overId);
         if (oldIndex === -1 || newIndex === -1 || oldIndex === newIndex) return items;
@@ -53,20 +53,20 @@ export function createDragEndHandler(
     }
     
     if(listChanged && updatedListState) {
-      const currentFideliList = (listType === 'fideli' && updatedListState) ? updatedListState : fideliList;
-      const currentInfideliList = (listType === 'infideli' && updatedListState) ? updatedListState : infideliList;
+      const currentDayList = (listType === 'day' && updatedListState) ? updatedListState : dayList;
+      const currentNightList = (listType === 'night' && updatedListState) ? updatedListState : nightList;
 
       const finalLayoutUpdates: LayoutUpdateItemArgs[] = [
-        ...currentFideliList.map((item, index) => ({ 
+        ...currentDayList.map((item, index) => ({ 
           item_id: item.id,
           item_type: item.item_type as 'page_component' | 'set',
           display_order: index, 
           page_path: pagePath 
         })),
-        ...currentInfideliList.map((item, index) => ({ 
+        ...currentNightList.map((item, index) => ({ 
           item_id: item.id,
           item_type: item.item_type as 'page_component' | 'set',
-          display_order: currentFideliList.length + index, 
+          display_order: currentDayList.length + index, 
           page_path: pagePath 
         })),
       ];
@@ -79,12 +79,12 @@ export function createDragEndHandler(
 export function createComponentHandler(
   newComponentTitle: string,
   newComponentText: string,
-  newComponentAffiliation: 'FIDELI' | 'INFIDELI' | '' | undefined,
+  newComponentAffiliation: 'DAY' | 'NIGHT' | '' | undefined,
   pagePath: string,
   createPageComponentMutation: any,
   setNewComponentTitle: (value: string) => void,
   setNewComponentText: (value: string) => void,
-  setNewComponentAffiliation: (value: 'FIDELI' | 'INFIDELI' | '' | undefined) => void
+  setNewComponentAffiliation: (value: 'DAY' | 'NIGHT' | '' | undefined) => void
 ) {
   return async (event: React.FormEvent) => {
     event.preventDefault();

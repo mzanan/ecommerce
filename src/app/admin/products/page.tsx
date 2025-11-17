@@ -10,7 +10,7 @@ import { generateMetadata } from '@/lib/utils/seo';
 
 export const metadata = generateMetadata({
   title: 'Products',
-  description: 'Manage Infideli products and inventory.',
+  description: 'Manage Noire products and inventory.',
   noIndex: true,
 });
 
