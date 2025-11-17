@@ -17,17 +17,23 @@ import {
 } from "@/components/ui/popover";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
-import { getData as getCoreCountryData } from 'country-list';
-
 interface Country {
     code: string;
     name: string;
 }
 
-const countriesData: Country[] = getCoreCountryData().map(country => ({
-    code: country.code,
-    name: country.name,
-}));
+let countriesDataCache: Country[] | null = null;
+
+function getCountriesData(): Country[] {
+    if (!countriesDataCache) {
+        const { getData } = require('country-list');
+        countriesDataCache = getData().map((country: any) => ({
+            code: country.code,
+            name: country.name,
+        }));
+    }
+    return countriesDataCache;
+}
 
 function getFlagEmoji(countryCode: string): string {
     if (!countryCode || countryCode.length !== 2) return '🌐';
@@ -46,6 +52,7 @@ interface CountrySelectorProps {
 
 export function CountrySelector({ value, onChange, disabled }: CountrySelectorProps) {
     const [open, setOpen] = React.useState(false);
+    const countriesData = React.useMemo(() => getCountriesData(), []);
     const selectedCountry = countriesData.find(country => country.code === value);
 
     return (

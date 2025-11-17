@@ -19,11 +19,13 @@ export function CountrySelect({ control, setValue }: CountrySelectProps) {
     
     const watchedCountry = useWatch({ control, name: 'country' });
     
-    const countries = Country.getAllCountries().map((country, index) => ({
-        value: country.isoCode,
-        label: country.name,
-        uniqueKey: `${country.isoCode}-${index}`
-    }));
+    const countries = React.useMemo(() => 
+        Country.getAllCountries().map((country, index) => ({
+            value: country.isoCode,
+            label: country.name,
+            uniqueKey: `${country.isoCode}-${index}`
+        })), []
+    );
 
     const handleCountrySelect = (value: string) => {
         setValue('country', value);
