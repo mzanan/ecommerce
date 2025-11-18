@@ -28,9 +28,9 @@ function getCountriesData(): Country[] {
     if (!countriesDataCache) {
         const { getData } = require('country-list');
         countriesDataCache = getData().map((country: any) => ({
-            code: country.code,
-            name: country.name,
-        }));
+    code: country.code,
+    name: country.name,
+}));
     }
     return countriesDataCache as Country[];
 }

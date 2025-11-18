@@ -148,7 +148,7 @@ export function generateSetMetadata(setData: {
     setData.type?.toLowerCase() || 'collection',
     setData.name.toLowerCase(),
   ]
-
+  
   return generateMetadata({
     title: setData.name,
     description: setData.description || `${setData.name} - Premium ${brandName} collection from Noire. Modern urban fashion.`,
@@ -169,7 +169,7 @@ export function generateProductMetadata(productData: {
     'streetwear',
     productData.name.toLowerCase(),
   ]
-
+  
   return generateMetadata({
     title: productData.name,
     description,

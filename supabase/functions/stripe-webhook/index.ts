@@ -1,9 +1,9 @@
 import Stripe from 'npm:stripe@^15.0.0';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { createClient } from 'jsr:@supabase/supabase-js@2';
 
 const COMPANY_INFO = {
   NAME: 'Noire',
-  WEBSITE_URL: Deno.env.get('NEXT_PUBLIC_APP_URL') || 'https://noire.com',
+  WEBSITE_URL: Deno.env.get('NEXT_PUBLIC_APP_URL'),
   SUPPORT_EMAIL: 'support@noire.com',
   CONTACT_EMAIL: 'contact@noire.com',
 } as const;

@@ -39,14 +39,14 @@ export function useHome(homepageItemsData: HomePageItemOrchestrator[]) {
           if (!isNaN(scrollPos) && scrollPos > 0) {
             setIsRestoringScroll(true);
             setTimeout(() => {
-              isScrollingProgrammatically.current = true;
+                isScrollingProgrammatically.current = true;
               window.scrollTo({ top: scrollPos, behavior: 'smooth' });
-              hasRestoredScrollRef.current = true;
-              
-              setTimeout(() => {
-                isScrollingProgrammatically.current = false;
-                setIsRestoringScroll(false);
-              }, 1000);
+                hasRestoredScrollRef.current = true;
+                
+                setTimeout(() => {
+                  isScrollingProgrammatically.current = false;
+                  setIsRestoringScroll(false);
+                }, 1000);
             }, 200);
           } else {
             hasRestoredScrollRef.current = true;
@@ -103,11 +103,11 @@ export function useHome(homepageItemsData: HomePageItemOrchestrator[]) {
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener('beforeunload', handleBeforeUnload);
+      window.addEventListener('beforeunload', handleBeforeUnload);
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener('beforeunload', handleBeforeUnload);
+        window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, [selectedType]);
 
@@ -122,7 +122,7 @@ export function useHome(homepageItemsData: HomePageItemOrchestrator[]) {
         if (targetSection) {
           const targetRect = targetSection.getBoundingClientRect();
           const scrollTop = window.scrollY + targetRect.top;
-
+          
           window.scrollTo({
             top: scrollTop,
             behavior: "smooth",

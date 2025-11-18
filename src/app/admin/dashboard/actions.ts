@@ -38,9 +38,9 @@ export async function updateOrderStatusAction(formData: FormData) {
     return { success: false, error: `Failed to update order status: ${updateError.message}` };
   }
 
-  if (!count || count === 0) {
-    console.log(`[DUPLICATE_ACTION_PREVENTED] Order ${orderId} status was already updated. Ignoring call.`);
-    return { success: true, message: 'Status already updated.' };
+  const wasAlreadyUpdated = !count || count === 0;
+  if (wasAlreadyUpdated) {
+    console.log(`[DUPLICATE_ACTION_PREVENTED] Order ${orderId} status was already ${newStatus}.`);
   }
 
   let emailTypeForFunction: 'order_in_transit' | 'order_delivered' | null = null;
@@ -52,6 +52,7 @@ export async function updateOrderStatusAction(formData: FormData) {
 
   if (emailTypeForFunction) {
     try {
+      console.log(`[ADMIN DASHBOARD] Invoking email function for order ${orderId} with type ${emailTypeForFunction}`);
       const { error: emailError } = await supabaseServerActionClient.functions.invoke('send-order-confirmation', {
         body: {
           orderId: orderId,
@@ -61,6 +62,8 @@ export async function updateOrderStatusAction(formData: FormData) {
 
       if (emailError) {
         console.error(`[ADMIN DASHBOARD] Error sending email for order ${orderId}:`, emailError);
+      } else {
+        console.log(`[ADMIN DASHBOARD] Email sent successfully for order ${orderId}`);
       }
     } catch (emailErr) {
       console.error(`[ADMIN DASHBOARD] Error in email sending process for order ${orderId}:`, emailErr);

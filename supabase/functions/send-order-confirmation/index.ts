@@ -1,5 +1,5 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts"
-import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { createClient, type SupabaseClient } from 'jsr:@supabase/supabase-js@2';
 import { SMTPClient } from "https://deno.land/x/denomailer@1.6.0/mod.ts";
 
 const COMPANY_INFO = {
@@ -395,15 +395,30 @@ Deno.serve(async (req: Request) => {
     const finalItemsHtmlList = itemsHtmlList + shippingHtml;
     const emailBodyHtml = generateEmailHtml(emailType, fullOrderDetails, finalItemsHtmlList, deliveryTimeframe);
 
+    const useTLS = smtpPort === 465;
+    
+    console.log(`[SMTP DEBUG] Configuration:`, {
+      hostname: smtpHost,
+      port: smtpPort,
+      tls: useTLS,
+      username: smtpUsername,
+      from: smtpFromEmail,
+      to: customerEmail,
+      hasPassword: !!smtpPassword,
+      passwordLength: smtpPassword?.length || 0
+    });
+
     const mailerClient = new SMTPClient({
       connection: {
         hostname: smtpHost,
         port: smtpPort,
-        tls: true,
+        tls: useTLS,
         auth: { username: smtpUsername, password: smtpPassword },
       },
       debug: { log: Deno.env.get("SMTP_DEBUG_LOG") === "true" }
     });
+
+    console.log(`[SMTP DEBUG] Client created, attempting to send...`);
 
     await mailerClient.send({
       from: smtpFromEmail,
@@ -412,7 +427,7 @@ Deno.serve(async (req: Request) => {
       html: emailBodyHtml,
     });
     
-    console.log(`SUCCESS: Email sent to ${customerEmail}`);
+    console.log(`[SMTP DEBUG] SUCCESS: Email sent to ${customerEmail}`);
     
     try { 
       await mailerClient.close(); 
@@ -430,7 +445,12 @@ Deno.serve(async (req: Request) => {
     });
 
   } catch (error: any) {
-    console.error(`ERROR: Failed to send email for order ${orderId} - ${error.message}`);
+    console.error(`[SMTP DEBUG] ERROR: Failed to send email for order ${orderId}`);
+    console.error(`[SMTP DEBUG] Error name:`, error.name);
+    console.error(`[SMTP DEBUG] Error message:`, error.message);
+    console.error(`[SMTP DEBUG] Error stack:`, error.stack);
+    console.error(`[SMTP DEBUG] Error keys:`, Object.keys(error));
+    console.error(`[SMTP DEBUG] Full error object:`, JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
     
     if (error.message.includes('not found') || error.message.includes('not accessible')) {
       console.log(`Order ${orderId} not found - likely deleted or test data. Returning success to avoid retries.`);

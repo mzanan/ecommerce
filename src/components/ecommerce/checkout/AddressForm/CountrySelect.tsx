@@ -21,9 +21,9 @@ export function CountrySelect({ control, setValue }: CountrySelectProps) {
     
     const countries = React.useMemo(() => 
         Country.getAllCountries().map((country, index) => ({
-            value: country.isoCode,
-            label: country.name,
-            uniqueKey: `${country.isoCode}-${index}`
+        value: country.isoCode,
+        label: country.name,
+        uniqueKey: `${country.isoCode}-${index}`
         })), []
     );
 
