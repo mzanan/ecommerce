@@ -1,6 +1,8 @@
 import { Suspense } from 'react';
 import StripeSyncPageClient from '@/components/admin/stripe/StripeSyncPageClient/StripeSyncPageClient';
 
+export const dynamic = 'force-dynamic';
+
 export default function StripeSyncPage() {
   return (
     <div className="container mx-auto p-6">

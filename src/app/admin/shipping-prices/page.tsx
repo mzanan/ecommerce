@@ -10,6 +10,7 @@ import { getCountryShippingPrices, getDefaultShippingPrice } from '@/lib/helpers
 import ShippingPricesPageClient from '@/components/admin/shipping/ShippingPricesPageClient';
 
 export { getShippingPriceForCountry } from '@/lib/helpers/shippingHelpers';
+export const dynamic = 'force-dynamic';
 
 export default async function ShippingPricesPageWrapper() {
     const supabase = createServerActionClient();

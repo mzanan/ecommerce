@@ -6,6 +6,8 @@ import SetEditPageClientContent from '@/components/admin/sets/SetEditPageClientC
 import type { SetImageRow } from '@/types/db';
 import { AdminPageTitle } from '@/components/admin/layout/AdminPageTitle/AdminPageTitle';
 
+export const dynamic = 'force-dynamic';
+
 export default async function EditSetPage({ params }: { params: Promise<{ setId: string }>}) {
     const { setId } = await params;
     

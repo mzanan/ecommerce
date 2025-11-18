@@ -5,6 +5,8 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertTriangle } from 'lucide-react';
 import type { SizeGuideTemplate } from '@/lib/schemas/sizeGuideTemplateSchema';
 
+export const dynamic = 'force-dynamic';
+
 export default async function EditSizeGuidePage({params }: { params: Promise<{ id: string }> }) {
     const { id: templateId } = await params; 
     

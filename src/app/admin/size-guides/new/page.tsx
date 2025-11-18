@@ -1,6 +1,8 @@
 import React from 'react';
 import SizeGuideTemplateForm from '@/components/admin/size-guides/SizeGuideTemplateForm/SizeGuideTemplateForm';
 
+export const dynamic = 'force-dynamic';
+
 export default function NewSizeGuidePage() {
   return (
     <div className="space-y-4">
