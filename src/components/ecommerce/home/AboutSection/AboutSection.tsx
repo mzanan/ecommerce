@@ -7,6 +7,7 @@ import {
   CarouselPrevious,
   CarouselNext,
 } from "@/components/ui/carousel";
+import SocialLinks from '@/components/ecommerce/layout/SocialLinks/SocialLinks';
 import { useAboutSection } from './useAboutSection';
 import type { AboutSectionProps } from '@/types/about';
 
@@ -26,7 +27,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
   return (
     <section className="min-h-dvh-header bg-gradient-to-br from-[#fafafa] via-[#f6f0ff] to-[#eae6ff] py-24 overflow-y-auto">
       <div className="container mx-auto px-12 lg:px-32">
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-10 lg:gap-0">
 
           {/* LEFT COLUMN */}
@@ -42,13 +43,18 @@ const AboutSection: React.FC<AboutSectionProps> = ({
             )}
 
             {text && (
-              <p
-                ref={textAnimation.elementRef}
-                style={textAnimation.animationStyles}
-                className="text-gray-600 text-lg lg:text-xl leading-relaxed whitespace-pre-wrap"
-              >
-                {text}
-              </p>
+              <>
+                <p
+                  ref={textAnimation.elementRef}
+                  style={textAnimation.animationStyles}
+                  className="text-gray-600 text-lg lg:text-xl leading-relaxed whitespace-pre-wrap"
+                >
+                  {text}
+                </p>
+                <div style={textAnimation.animationStyles}>
+                  <SocialLinks className="mt-6" />
+                </div>
+              </>
             )}
           </div>
 
