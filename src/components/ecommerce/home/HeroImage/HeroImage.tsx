@@ -2,19 +2,16 @@
 
 import React, { forwardRef, useRef, useEffect } from 'react';
 import Image from 'next/image';
-import { useSnapClasses } from '@/hooks/useSnapClasses';
 
 interface HeroImageProps {
   imageUrl: string | null | undefined;
   isLoading?: boolean;
-  isIosDevice?: boolean;
 }
 
-const HeroImage = forwardRef<HTMLDivElement, HeroImageProps>(({ imageUrl, isLoading, isIosDevice = false }, ref) => {
-  const { getSnapClasses } = useSnapClasses({ isIosDevice });
+const HeroImage = forwardRef<HTMLDivElement, HeroImageProps>(({ imageUrl, isLoading }, ref) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const isVideoUrl = (url: string) => /\.(mp4|webm|ogg)$/i.test(url);
-  
+
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -23,7 +20,7 @@ const HeroImage = forwardRef<HTMLDivElement, HeroImageProps>(({ imageUrl, isLoad
       if (document.hidden) {
         video.pause();
       } else {
-        video.play().catch(() => {});
+        video.play().catch(() => { });
       }
     };
 
@@ -32,7 +29,7 @@ const HeroImage = forwardRef<HTMLDivElement, HeroImageProps>(({ imageUrl, isLoad
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             if (!document.hidden) {
-              video.play().catch(() => {});
+              video.play().catch(() => { });
             }
           } else {
             video.pause();
@@ -50,14 +47,14 @@ const HeroImage = forwardRef<HTMLDivElement, HeroImageProps>(({ imageUrl, isLoad
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [imageUrl]);
-  
+
   if (isLoading && !imageUrl) {
     return (
-      <div className={`h-[calc(100vh-var(--header-height))] w-full bg-gray-200 animate-pulse ${getSnapClasses()}`}></div>
+      <div className="sm:min-h-dvh-header md:h-dvh-header w-full bg-gray-200 animate-pulse snap-start"></div>
     );
   }
   return (
-    <div ref={ref} className={`h-[calc(100vh-var(--header-height))] bg-black ${getSnapClasses()}`}>
+    <div ref={ref} className="sm:min-h-dvh-header md:h-dvh-header bg-black snap-start">
       <section className='relative h-full w-full'>
         {imageUrl && (isVideoUrl(imageUrl) ? (
           <video
@@ -71,7 +68,7 @@ const HeroImage = forwardRef<HTMLDivElement, HeroImageProps>(({ imageUrl, isLoad
             controls={false}
           />
         ) : (
-          <Image 
+          <Image
             src={imageUrl}
             alt='Hero background image'
             fill

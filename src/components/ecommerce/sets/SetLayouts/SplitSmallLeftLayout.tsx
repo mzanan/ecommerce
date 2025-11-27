@@ -17,10 +17,10 @@ const SplitSmallLeftLayout: React.FC<SplitSmallLeftLayoutProps> = ({ set, isHome
   const imageUrl2 = sortedImages?.[1]?.image_url;
 
   return (
-    <div className='flex flex-col gap-8 min-h-[calc(100vh-var(--header-height))] p-4 md:p-0 max-w-[1880px] mx-auto'>
-      <SetLayoutHeader set={set} isHomepageContext={isHomepageContext} />
+    <div className='flex flex-col gap-8 h-full px-4 md:px-0 max-w-[1880px] mx-auto overflow-hidden'>
+      {!isHomepageContext && <SetLayoutHeader set={set} isHomepageContext={isHomepageContext} />}
 
-      <div className="flex flex-col md:flex-row gap-8 flex-grow">
+      <div className="flex flex-col md:flex-row gap-8 flex-grow min-h-0">
         <SetCard
           set={set}
           imageUrl={imageUrl1}

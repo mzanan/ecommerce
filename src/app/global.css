@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --header-height: 56px;
+  --header-height: 53px;
   --background: oklch(0.99 0 0);
   --foreground: oklch(0 0 0);
   --card: oklch(1 0 0);
@@ -157,8 +157,31 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .h-dvh-header {
+    height: calc(100dvh - var(--header-height));
+  }
+
+  .min-h-dvh-header {
+    min-height: calc(100dvh - var(--header-height));
+  }
+
+  @media (min-width: 640px) {
+    .sm\:min-h-dvh-header {
+      min-height: calc(100dvh - var(--header-height));
+    }
+  }
+
+  @media (min-width: 768px) {
+    .md\:h-dvh-header {
+      height: calc(100dvh - var(--header-height));
+    }
   }
 }
 
@@ -169,7 +192,7 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: hsl(var(--muted)); 
+  background: hsl(var(--muted));
   border-radius: 10px;
 }
 

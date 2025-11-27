@@ -24,7 +24,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
   } = useAboutSection({ images, aspectRatio });
 
   return (
-    <section className="min-h-screen bg-gradient-to-br from-[#fafafa] via-[#f6f0ff] to-[#eae6ff] py-24">
+    <section className="min-h-dvh-header bg-gradient-to-br from-[#fafafa] via-[#f6f0ff] to-[#eae6ff] py-24 overflow-y-auto">
       <div className="container mx-auto px-12 lg:px-32">
         
         <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-10 lg:gap-0">

@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 export const seoConfig = {
   siteName: 'Noire',
-  siteUrl: process.env.NEXT_PUBLIC_APP_URL || 'https://noire.com',
+  siteUrl: process.env.NEXT_PUBLIC_APP_URL,
   defaultTitle: 'Noire - Urban Streetwear',
   defaultDescription: 'Modern streetwear collections featuring day and night styles. Premium quality urban fashion.',
   defaultKeywords: ['streetwear', 'urban fashion', 'modern clothing', 'day collection', 'night collection'] as string[],
@@ -11,7 +11,7 @@ export const seoConfig = {
   locale: 'en_US',
   organization: {
     name: 'Noire',
-    url: process.env.NEXT_PUBLIC_APP_URL || 'https://noire.com',
+    url: process.env.NEXT_PUBLIC_APP_URL,
     logo: '/logo.png',
     description: 'Modern urban streetwear featuring day and night collections.',
     contactPoint: {
@@ -36,7 +36,7 @@ export const baseMetadata: Metadata = {
   keywords: seoConfig.defaultKeywords,
   authors: [{ name: seoConfig.siteName }],
   creator: seoConfig.siteName,
-  metadataBase: new URL(seoConfig.siteUrl),
+  metadataBase: seoConfig.siteUrl ? new URL(seoConfig.siteUrl) : undefined,
   
   openGraph: {
     type: 'website',

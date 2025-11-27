@@ -18,10 +18,10 @@ const StaggeredThreeLayout: React.FC<StaggeredThreeLayoutProps> = ({ set, isHome
   const imageUrl3 = sortedImages?.[2]?.image_url;
 
       return (
-        <div className="flex flex-col min-h-[calc(100vh-var(--header-height))] px-4 gap-8 max-w-[1880px] mx-auto">
-            <SetLayoutHeader set={set} isHomepageContext={isHomepageContext} />
+        <div className="flex flex-col h-full px-4 gap-8 max-w-[1880px] mx-auto overflow-hidden">
+            {!isHomepageContext && <SetLayoutHeader set={set} isHomepageContext={isHomepageContext} />}
 
-      <div className="relative flex flex-col md:flex-row md:justify-center flex-1 gap-8 2xl:gap-0">
+      <div className="relative flex flex-col md:flex-row md:justify-center flex-1 gap-8 2xl:gap-0 min-h-0">
         <div className="flex flex-col w-full items-center md:self-start">
           <SetCard
             set={set}

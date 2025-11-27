@@ -17,8 +17,8 @@ const TwoHorizontalLayout: React.FC<TwoHorizontalLayoutProps> = ({ set, isHomepa
   const imageUrl2 = sortedImages?.[1]?.image_url;
 
   return (
-    <div className="flex flex-col md:h-[calc(100vh-var(--header-height))] p-4 md:px-4 gap-8 max-w-[1880px] mx-auto">
-      <SetLayoutHeader set={set} isHomepageContext={isHomepageContext} />
+    <div className="flex flex-col h-full px-4 md:px-4 gap-8 max-w-[1880px] mx-auto overflow-hidden">
+      {!isHomepageContext && <SetLayoutHeader set={set} isHomepageContext={isHomepageContext} />}
 
       <div className="relative flex flex-col md:grid md:grid-cols-1 md:grid-rows-2 flex-1 gap-8 min-h-0">
         <div className="w-full md:h-full md:overflow-hidden">

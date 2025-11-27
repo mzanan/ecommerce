@@ -17,8 +17,8 @@ const CartIcon = () => {
   const displayItemCount = isMounted ? itemCount : 0;
 
   return (
-    <Link 
-      href="/cart" 
+    <Link
+      href="/cart"
       className="relative inline-flex items-center justify-center p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
       aria-label="View Cart"
     >
@@ -38,39 +38,39 @@ export default function Header() {
 
   const handleLogoClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
     if (pathname === '/') {
-      event.preventDefault(); 
+      event.preventDefault();
       router.replace('/', { scroll: false });
-      
+
       if (window.scrollY !== 0) {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     } else {
       setTimeout(() => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
-      }, 0); 
+      }, 0);
     }
   };
 
   return (
-    <header 
-      className="sticky top-0 z-50 w-full max-w-[100vw] bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 overflow-x-hidden" 
-      style={{ 
+    <header
+      className="sticky top-0 z-50 w-full max-w-[100vw] bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 overflow-hidden"
+      style={{
         position: 'sticky',
         willChange: 'transform',
         transform: 'translateZ(0)'
       }}
     >
-      <div className="container mx-auto p-2 flex justify-between">
+      <div className="container mx-auto p-2 flex justify-between items-center">
         <div></div>
 
-        <Link 
-          href="/" 
+        <Link
+          href="/"
           className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
           onClick={handleLogoClick}
         >
-           <span className="text-2xl font-bold tracking-tighter uppercase">
-             <span>Noire</span>
-           </span>
+          <span className="text-2xl font-bold tracking-tighter uppercase">
+            <span>Noire</span>
+          </span>
         </Link>
 
         <div>

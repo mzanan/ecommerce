@@ -3,29 +3,25 @@
 import React, { forwardRef } from 'react';
 import type { SetType } from '@/lib/schemas/setSchema';
 import { usePathSelector } from '@/hooks/usePathSelector';
-import { useSnapClasses } from '@/hooks/useSnapClasses';
 import AnimatedWord from '../AnimatedWord/AnimatedWord';
 
 interface PathSelectorProps {
   selectedType: SetType | null;
   onSelectType: (type: SetType) => void;
   onDiagonalAnimationComplete?: () => void;
-  isIosDevice?: boolean;
 }
 
 const PathSelector = forwardRef<HTMLElement, PathSelectorProps>((
   { 
     selectedType, 
     onSelectType,
-    onDiagonalAnimationComplete,
-    isIosDevice = false
+    onDiagonalAnimationComplete
   }, 
   ref
 ) => {
-  const { getSnapClasses } = useSnapClasses({ isIosDevice });
   const { setHoveredPath, whiteSideRef, getDiagonalPosition } = usePathSelector({
     selectedType,
-    onDiagonalAnimationComplete: onDiagonalAnimationComplete || (() => {}),
+    onDiagonalAnimationComplete: onDiagonalAnimationComplete || (() => { }),
   });
 
   const { topPosition, bottomPosition } = getDiagonalPosition();
@@ -39,7 +35,7 @@ const PathSelector = forwardRef<HTMLElement, PathSelectorProps>((
   };
 
   return (
-    <section id="path-selector" ref={ref} className={`relative h-screen w-full max-w-[100vw] overflow-hidden ${getSnapClasses()}`}>
+    <section id="path-selector" ref={ref} className="relative sm:min-h-dvh-header md:h-dvh-header w-full max-w-[100vw] overflow-hidden snap-start">
       <div className="absolute top-10 left-1/2 transform -translate-x-1/2 text-center z-20">
         <p className="text-lg font-medium text-gray-500 mb-2">Choose your path</p>
         <div className="flex items-center gap-2 text-sm text-gray-400">

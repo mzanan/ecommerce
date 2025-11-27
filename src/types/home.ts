@@ -1,7 +1,5 @@
-import React from 'react';
 import type { SetRow, PageComponent } from './db';
 import type { HeroDbRow } from './hero';
-import type { MotionValue } from 'framer-motion';
 
 export interface AboutContentData {
   text_content: string | null;
@@ -17,7 +15,6 @@ export interface HomeProps {
   homepageItemsData: HomePageItemOrchestrator[];
   aboutContentData: AboutContentData | null;
   heroContentData: HeroDbRow | null;
-  isIosDevice?: boolean;
 }
 
 export interface UseHomeProps {
@@ -35,16 +32,6 @@ export interface AnimatedWordProps {
 export interface DisplaySetsProps {
   homepageItems: (PageComponent & { item_type: 'page_component' } | SetRow & { item_type: 'set' })[];
   primaryType: 'DAY' | 'NIGHT' | null;
-  secondaryType: 'DAY' | 'NIGHT';
-  setsAnimationProgress: MotionValue<number>;
-  titleVisibilityProgress: MotionValue<number>;
-  isIosDevice?: boolean;
-}
-
-export interface SectionTitleComponentProps {
-  type: 'DAY' | 'NIGHT';
-  titleVisibilityProgress: MotionValue<number>;
-  isPrimary: boolean;
 }
 
 export interface AnimatedSetRendererProps {
@@ -52,16 +39,6 @@ export interface AnimatedSetRendererProps {
   isHomepageContext: boolean;
   type: 'DAY' | 'NIGHT';
   index: number;
-}
-
-export interface AnimatedSectionProps {
-  type: 'DAY' | 'NIGHT';
-  isPrimary: boolean;
-  items: React.JSX.Element[];
-  getTypeSpecificClasses: (type: 'DAY' | 'NIGHT', isPrimary: boolean) => string;
-  setsAnimationProgress: MotionValue<number>;
-  titleVisibilityProgress: MotionValue<number>;
-  shouldControlAnimation?: boolean;
 }
 
 export interface AnimatedTextComponentProps {

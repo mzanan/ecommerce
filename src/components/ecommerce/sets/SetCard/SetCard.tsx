@@ -28,7 +28,7 @@ const SetCard: React.FC<SetCardProps> = ({
   animationDelay = 0,
 }) => {
   const defaultAltText = `${set.name ?? 'Set'} image`;
-  
+
   const { elementRef, animationStyles } = useFadeInAnimation<HTMLDivElement>({
     delay: animationDelay,
     duration: 800,
@@ -36,15 +36,21 @@ const SetCard: React.FC<SetCardProps> = ({
     translateX: 0,
   });
 
+  const hasHeightConstraint = containerClassName?.includes('h-full') || containerClassName?.includes('max-h-full');
+  const hasAspectRatioInClassName = imageClassName?.includes('aspect-');
+  const shouldUseAspectRatio = !hasHeightConstraint || hasAspectRatioInClassName;
+
   return (
-    <div 
+    <div
       ref={elementRef}
       className={cn('group w-full', containerClassName)}
       style={animationStyles}
     >
       <div
         className={cn(
-          'relative aspect-[9/14] w-full overflow-hidden rounded-lg max-h-[calc(100vh-var(--header-height))]',
+          'relative w-full overflow-hidden rounded-lg',
+          shouldUseAspectRatio && !hasAspectRatioInClassName && 'aspect-[9/14]',
+          !shouldUseAspectRatio && !hasAspectRatioInClassName && 'h-full',
           imageClassName
         )}
       >
@@ -60,7 +66,10 @@ const SetCard: React.FC<SetCardProps> = ({
               fill
               priority={isPriority}
               sizes="(max-width: 540px) 100vw, 540px"
-              className="object-cover object-center transition-transform duration-300 ease-in-out group-hover:scale-105 rounded-lg"
+              className={cn(
+                "transition-transform duration-300 ease-in-out group-hover:scale-105 rounded-lg",
+                imageClassName?.includes('object-contain') ? 'object-contain' : 'object-cover object-center'
+              )}
               loading={isPriority ? 'eager' : 'lazy'}
             />
           )}

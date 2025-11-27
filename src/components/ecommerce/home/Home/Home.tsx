@@ -8,17 +8,13 @@ import DisplaySets from '@/components/ecommerce/home/DisplaySets/DisplaySets';
 import Footer from '@/components/ecommerce/layout/Footer/Footer';
 import { useHome } from './useHome';
 import { useImagePreloader, extractImageUrls } from '@/hooks/useImagePreloader';
-import { useSnapClasses } from '@/hooks/useSnapClasses';
 import type { HomeProps } from '@/types/home';
 
 export default function Home({
   homepageItemsData,
   aboutContentData,
-  heroContentData,
-  isIosDevice = false
+  heroContentData
 }: HomeProps) {
-  const { getSnapClasses, getScrollContainerClasses } = useSnapClasses({ isIosDevice });
-  
   const {
     selectedType,
     whiteSectionRef,
@@ -26,8 +22,7 @@ export default function Home({
     handlePathSelect,
     handleDiagonalAnimationComplete,
     processedHomepageItems,
-    effectiveSelectedType,
-    isRestoringScroll,
+    effectiveSelectedType
   } = useHome(homepageItemsData);
 
   const heroImageUrl = heroContentData?.image_url;
@@ -35,48 +30,32 @@ export default function Home({
 
   const allImageUrls = React.useMemo(() => {
     const urls: string[] = [];
-    
+
     if (heroImageUrl && isImageUrl(heroImageUrl)) urls.push(heroImageUrl);
-    
+
     urls.push(...extractImageUrls(homepageItemsData));
     urls.push(...extractImageUrls(aboutContentData));
-    
+
     return urls;
   }, [heroImageUrl, homepageItemsData, aboutContentData]);
 
   useImagePreloader(allImageUrls, { enabled: true, priority: true });
 
-  const getContainerClasses = () => {
-    const baseClasses = "overflow-x-hidden w-full max-w-[100vw]";
-    if (isRestoringScroll) {
-      return baseClasses;
-    }
-    return getScrollContainerClasses(baseClasses);
-  };
-
   const renderContentSections = () => {
     const whiteSection = (
-      <div ref={whiteSectionRef} className={getSnapClasses()}>
-        <DisplaySets 
+      <div ref={whiteSectionRef}>
+        <DisplaySets
           homepageItems={processedHomepageItems}
           primaryType="DAY"
-          secondaryType="NIGHT"
-          setsAnimationProgress={{ get: () => 1, set: () => {}, on: () => () => {} } as any}
-          titleVisibilityProgress={{ get: () => 1, set: () => {}, on: () => () => {} } as any}
-          isIosDevice={isIosDevice}
         />
       </div>
     );
 
     const blackSection = (
-      <div ref={blackSectionRef} className={getSnapClasses()}>
-        <DisplaySets 
+      <div ref={blackSectionRef}>
+        <DisplaySets
           homepageItems={processedHomepageItems}
           primaryType="NIGHT"
-          secondaryType="DAY"
-          setsAnimationProgress={{ get: () => 1, set: () => {}, on: () => () => {} } as any}
-          titleVisibilityProgress={{ get: () => 1, set: () => {}, on: () => () => {} } as any}
-          isIosDevice={isIosDevice}
         />
       </div>
     );
@@ -89,21 +68,20 @@ export default function Home({
   };
 
   return (
-    <div className={getContainerClasses()}>
-      <HeroImage imageUrl={heroImageUrl} isIosDevice={isIosDevice} />
+    <div className="overflow-x-hidden overflow-y-scroll w-full max-w-[100vw] snap-y snap-mandatory" style={{ height: '100vh' }}>
+      <HeroImage imageUrl={heroImageUrl} />
 
       <PathSelector
         selectedType={selectedType}
         onSelectType={handlePathSelect}
         onDiagonalAnimationComplete={handleDiagonalAnimationComplete}
-        isIosDevice={isIosDevice}
       />
 
       {renderContentSections()}
 
       {aboutContentData && aboutContentData.text_content && (
-        <div className={getSnapClasses()}>
-          <AboutSection 
+        <div className="snap-start sm:min-h-dvh-header md:h-dvh-header">
+          <AboutSection
             text={aboutContentData.text_content}
             images={aboutContentData.image_urls}
             aspectRatio={aboutContentData.image_aspect_ratio || 'square'}
@@ -111,7 +89,7 @@ export default function Home({
         </div>
       )}
 
-      <div className={getSnapClasses()}>
+      <div className="snap-start sm:min-h-dvh-header md:h-dvh-header">
         <Footer />
       </div>
     </div>

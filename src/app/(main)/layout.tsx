@@ -15,9 +15,9 @@ export default function AppGroupLayout({
   const isHomePage = pathname === '/';
 
   return (
-    <div className="bg-background relative min-h-screen flex flex-col w-full max-w-[100vw] overflow-x-hidden">
+    <div className={`bg-background relative flex flex-col w-full max-w-[100vw] overflow-x-hidden ${isHomePage ? 'h-screen overflow-y-hidden' : 'min-h-screen'}`}>
       <Header />
-      <main className="relative flex-1 w-full overflow-x-hidden">{children}</main>
+      <main className={`relative w-full overflow-x-hidden ${isHomePage ? 'h-full overflow-y-hidden' : 'flex-1'}`}>{children}</main>
       {!isHomePage && <Footer />}
       <FloatingCartIcon />
     </div>

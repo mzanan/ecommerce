@@ -2,13 +2,14 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import type { SetType } from '@/lib/schemas/setSchema';
 import type { HomePageItemOrchestrator } from '@/types/home';
 import { useScrollRestorationContext } from '@/components/providers/ScrollRestorationProvider';
+import { shouldRestoreScroll, getSavedScrollPosition, restoreScrollToPosition } from '@/lib/helpers/scrollRestoration';
+import { createScrollHandler, createBeforeUnloadHandler } from '@/lib/helpers/homeScrollHandlers';
 
 export function useHome(homepageItemsData: HomePageItemOrchestrator[]) {
   const [selectedType, setSelectedType] = useState<SetType | null>(null);
   const [hasScrolledPastSelector, setHasScrolledPastSelector] = useState(false);
   const [shouldAutoScroll, setShouldAutoScroll] = useState(false);
   const autoScrollEnabledRef = useRef(false);
-  const [isRestoringScroll, setIsRestoringScroll] = useState(false);
   const whiteSectionRef = useRef<HTMLDivElement>(null);
   const blackSectionRef = useRef<HTMLDivElement>(null);
   const isScrollingProgrammatically = useRef(false);
@@ -19,41 +20,21 @@ export function useHome(homepageItemsData: HomePageItemOrchestrator[]) {
   useEffect(() => {
     if (hasRestoredScrollRef.current) return;
 
-    const restoreScrollPosition = () => {
-      const navigationEntries = typeof window !== 'undefined' ? performance.getEntriesByType("navigation") : [];
-      const navigationType = navigationEntries.length > 0 ? (navigationEntries[0] as PerformanceNavigationTiming).type : null;
-
-      let shouldRestore = false;
-      if (navigationType === 'reload') {
-        shouldRestore = true;
-      } else if (navigationType === 'back_forward') {
-        shouldRestore = true;
-      } else if (!isInitialLoadInSession) {
-        shouldRestore = true;
+    const performRestore = () => {
+      if (!shouldRestoreScroll(isInitialLoadInSession)) {
+        hasRestoredScrollRef.current = true;
+        return;
       }
 
-      if (shouldRestore && typeof window !== 'undefined') {
-        const savedScrollPos = localStorage.getItem('homeScrollPos');
-        if (savedScrollPos) {
-          const scrollPos = parseInt(savedScrollPos, 10);
-          if (!isNaN(scrollPos) && scrollPos > 0) {
-            setIsRestoringScroll(true);
-            setTimeout(() => {
+      const savedPos = getSavedScrollPosition();
+      if (savedPos) {
                 isScrollingProgrammatically.current = true;
-              window.scrollTo({ top: scrollPos, behavior: 'smooth' });
-                hasRestoredScrollRef.current = true;
-                
-                setTimeout(() => {
-                  isScrollingProgrammatically.current = false;
-                  setIsRestoringScroll(false);
-                }, 1000);
-            }, 200);
-          } else {
-            hasRestoredScrollRef.current = true;
-          }
-        } else {
+        restoreScrollToPosition(savedPos, () => {
           hasRestoredScrollRef.current = true;
-        }
+          setTimeout(() => {
+            isScrollingProgrammatically.current = false;
+          }, 500);
+        });
       } else {
         hasRestoredScrollRef.current = true;
       }
@@ -61,46 +42,30 @@ export function useHome(homepageItemsData: HomePageItemOrchestrator[]) {
 
     if (typeof window !== 'undefined') {
       if (document.readyState === 'complete') {
-        restoreScrollPosition();
+        performRestore();
       } else {
-        window.addEventListener('load', restoreScrollPosition, { once: true });
+        window.addEventListener('load', performRestore, { once: true });
       }
     }
 
     return () => {
       if (typeof window !== 'undefined') {
-        window.removeEventListener('load', restoreScrollPosition);
+        window.removeEventListener('load', performRestore);
       }
     };
   }, [isInitialLoadInSession]);
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (isScrollingProgrammatically.current || !hasRestoredScrollRef.current) return;
+    const handleScroll = createScrollHandler(
+      selectedType,
+      setSelectedType,
+      setHasScrolledPastSelector,
+      isScrollingProgrammatically,
+      hasRestoredScrollRef,
+      hasManuallyScrolledAfterRestore
+    );
 
-      if (hasRestoredScrollRef.current && !hasManuallyScrolledAfterRestore.current) {
-        hasManuallyScrolledAfterRestore.current = true;
-      }
-
-      const pathSelectorElement = document.getElementById("path-selector");
-      if (pathSelectorElement && selectedType === null) {
-        const rect = pathSelectorElement.getBoundingClientRect();
-        if (rect.bottom < window.innerHeight * 0.2) {
-          setSelectedType("DAY");
-          setHasScrolledPastSelector(true);
-        }
-      }
-
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('homeScrollPos', String(window.scrollY));
-      }
-    };
-
-    const handleBeforeUnload = () => {
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('homeScrollPos', String(window.scrollY));
-      }
-    };
+    const handleBeforeUnload = createBeforeUnloadHandler();
 
     window.addEventListener("scroll", handleScroll, { passive: true });
       window.addEventListener('beforeunload', handleBeforeUnload);
@@ -109,7 +74,7 @@ export function useHome(homepageItemsData: HomePageItemOrchestrator[]) {
       window.removeEventListener("scroll", handleScroll);
         window.removeEventListener('beforeunload', handleBeforeUnload);
     };
-  }, [selectedType]);
+  }, [selectedType, setSelectedType, setHasScrolledPastSelector]);
 
   useEffect(() => {
     if (shouldAutoScroll && (whiteSectionRef.current || blackSectionRef.current)) {
@@ -120,12 +85,9 @@ export function useHome(homepageItemsData: HomePageItemOrchestrator[]) {
         const targetSection = effectiveSelectedType === "DAY" ? whiteSectionRef.current : blackSectionRef.current;
 
         if (targetSection) {
-          const targetRect = targetSection.getBoundingClientRect();
-          const scrollTop = window.scrollY + targetRect.top;
-          
-          window.scrollTo({
-            top: scrollTop,
+          targetSection.scrollIntoView({
             behavior: "smooth",
+            block: "start"
           });
 
           setTimeout(() => {
@@ -182,7 +144,6 @@ export function useHome(homepageItemsData: HomePageItemOrchestrator[]) {
     handlePathSelect,
     handleDiagonalAnimationComplete,
     processedHomepageItems,
-    effectiveSelectedType,
-    isRestoringScroll,
+    effectiveSelectedType
   };
 } 

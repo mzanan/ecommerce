@@ -87,6 +87,7 @@ export default function RootLayout({
           greatVibes.variable,
           "font-sans antialiased"
         )}
+        suppressHydrationWarning
       >
         <AppThemeProvider
           attribute="class"

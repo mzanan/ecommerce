@@ -66,11 +66,7 @@ export function AddressForm({
                 paymentError={paymentError}
                 validationWarning={validationWarning}
                 isProcessingPayment={isProcessingPayment}
-                onProcessPayment={() => {
-                    if (formDataForConfirmation) {
-                        handlePaymentSubmission(formDataForConfirmation);
-                    }
-                }}
+                onProcessPayment={formDataForConfirmation ? () => handlePaymentSubmission(formDataForConfirmation) : () => {}}
                 isPlaceOrderDisabled={isPlaceOrderDisabled}
                 isWaitingForShipping={isWaitingForShipping}
             />

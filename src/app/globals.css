@@ -3,11 +3,20 @@
 @custom-variant dark (&:is(.dark *));
 @tailwind utilities;
 
-html,
+html {
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  height: 100%;
+}
+
+
 body {
   position: relative;
   overflow-x: hidden;
-  scroll-behavior: smooth;
+  overflow-y: hidden;
+  height: 100%;
 }
 
 /* Fix for mobile horizontal overflow issues */
