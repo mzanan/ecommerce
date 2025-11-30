@@ -40,6 +40,9 @@ export const metadata: Metadata = {
   creator: "night",
   publisher: "night",
   robots: "index, follow",
+  icons: {
+    icon: "/icon.svg",
+  },
   openGraph: {
     type: "website",
     siteName: "night",
@@ -47,7 +50,7 @@ export const metadata: Metadata = {
     description: "Luxury lingerie collections featuring elegant day and seductive night sets. Premium quality intimate apparel for the modern woman.",
     images: [
       {
-        url: "/images/og-default.jpg",
+        url: "/og-image.png",
         width: 1200,
         height: 630,
         alt: "night Luxury Lingerie",
@@ -58,7 +61,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "night - Luxury Lingerie Collections",
     description: "Luxury lingerie collections featuring elegant day and seductive night sets. Premium quality intimate apparel for the modern woman.",
-    images: ["/images/og-default.jpg"],
+    images: ["/og-image.png"],
   },
 };
 

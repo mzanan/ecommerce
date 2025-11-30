@@ -36,11 +36,21 @@ export const PaymentView: React.FC<PaymentViewProps> = ({
                 </div>
             )}
             
+            <div className="bg-yellow-100 border border-yellow-300 rounded-lg p-4 mt-6">
+                <p className="text-yellow-800 text-sm font-medium text-center">
+                    Payments are in demo mode using Stripe, so no real charges will be made.
+                </p>
+                <p className="text-yellow-800 text-sm font-medium text-center">
+                    Use card number <span className="font-bold">4242 4242 4242 4242</span> with any CVC and a valid expiration date.
+                </p>
+            </div>
+
             <div className="p-4 border rounded-md bg-white dark:bg-neutral-800 shadow-sm">
                 <FormControl>
                   <CardElement options={cardElementOptions} />
                 </FormControl>
             </div>
+
             <FormDescription className="text-xs text-muted-foreground -mt-4">
               We do not store your credit card details. Payments are securely processed by Stripe.
             </FormDescription>
