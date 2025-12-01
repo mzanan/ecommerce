@@ -50,11 +50,11 @@ const HeroImage = forwardRef<HTMLDivElement, HeroImageProps>(({ imageUrl, isLoad
 
   if (isLoading && !imageUrl) {
     return (
-      <div className="sm:min-h-dvh-header md:h-dvh-header w-full bg-gray-200 animate-pulse snap-start"></div>
+      <div className="h-dvh w-full bg-gray-200 animate-pulse snap-start"></div>
     );
   }
   return (
-    <div ref={ref} className="sm:min-h-dvh-header md:h-dvh-header bg-black snap-start">
+    <div ref={ref} className="h-dvh bg-black snap-start">
       <section className='relative h-full w-full'>
         {imageUrl && (isVideoUrl(imageUrl) ? (
           <video
