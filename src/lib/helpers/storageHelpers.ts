@@ -203,7 +203,7 @@ export function getStoragePathFromUrl(publicUrl: string, bucketName: string): st
     }
 }
 
-export async function uploadHeroImage(file: File, onProgress?: (percent: number) => void): Promise<{ publicUrl: string | null, path: string | null, error: string | null }> {
+export async function uploadHeroImage(file: File): Promise<{ publicUrl: string | null, path: string | null, error: string | null }> {
     const supabase = createServerActionClient();
     const isVideo = typeof file.type === 'string' && file.type.startsWith('video/');
     
@@ -213,13 +213,7 @@ export async function uploadHeroImage(file: File, onProgress?: (percent: number)
     try {
         if (isVideo) {
             console.log('[HERO STORAGE] Starting video optimization...');
-            optimized = await optimizeVideoFile(file, { 
-                targetHeight: 720, 
-                bitrateKbps: 1200, 
-                fps: 24, 
-                format: 'mp4',
-                onProgress 
-            });
+            optimized = await optimizeVideoFile(file);
             console.log('[HERO STORAGE] Video optimized to:', (optimized.buffer.length / 1024 / 1024).toFixed(2), 'MB');
         } else {
             console.log('[HERO STORAGE] Starting image optimization...');

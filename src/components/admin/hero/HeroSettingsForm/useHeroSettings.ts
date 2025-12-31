@@ -104,7 +104,6 @@ export function useHeroSettings(initialDataFromProps: HeroDbRow | null) {
   }, [currentHeroData, queryClient]);
 
   const handleDeleteHeroImage = useCallback(async () => {
-    console.log('[HERO UI] Delete button clicked');
     setIsDeleting(true);
     
     try {
