@@ -166,12 +166,12 @@ export async function createSetAction(
             }
         } 
 
-        revalidateTag('sets');
+        revalidateTag('sets', {});
         revalidatePath('/admin/sets');
         revalidatePath('/admin/home-design');
         revalidatePath('/'); 
         if(newSet.slug){
-            revalidateTag(`set-${newSet.slug}`);
+            revalidateTag(`set-${newSet.slug}`, {});
             revalidatePath(`/set/${newSet.slug}`);
         }
 

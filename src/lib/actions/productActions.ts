@@ -23,9 +23,6 @@ import {
   updateProductSetAssociations
 } from '@/lib/helpers/productHelpers';
 
-export type { ProductPageData };
-export type { ProductByIdEditResponse };
-
 export async function createProduct(
   prevState: ActionResponse | null,
   formData: FormData
@@ -197,8 +194,8 @@ export async function createProduct(
             }
         }
 
-        revalidateTag('products');
-        revalidateTag(`product-${validatedProductData.slug}`);
+        revalidateTag('products', {});
+        revalidateTag(`product-${validatedProductData.slug}`, {});
         revalidatePath('/admin/products');
         revalidatePath(`/product/${validatedProductData.slug}`);
         revalidatePath('/');
@@ -317,8 +314,8 @@ export async function updateProduct(
             throw new Error(`Helper operation failed: ${helperError.message}`);
         }
 
-        revalidateTag('products');
-        revalidateTag(`product-${validatedProductData.slug}`);
+        revalidateTag('products', {});
+        revalidateTag(`product-${validatedProductData.slug}`, {});
         revalidatePath('/admin/products');
         revalidatePath(`/product/${validatedProductData.slug}`);
         revalidatePath('/');
@@ -393,9 +390,9 @@ export async function deleteProduct(productId: string): Promise<ActionResponse> 
             return { success: false, error: `Error deleting product: ${deleteError.message}` };
         }
 
-        revalidateTag('products');
+        revalidateTag('products', {});
         if (productData.slug) {
-            revalidateTag(`product-${productData.slug}`);
+            revalidateTag(`product-${productData.slug}`, {});
             revalidatePath(`/product/${productData.slug}`);
         }
         revalidatePath('/admin/products');

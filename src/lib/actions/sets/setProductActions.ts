@@ -25,7 +25,7 @@ export async function addProductToSet(setId: string, productId: string): Promise
             throw new Error(error.message);
         }
 
-        revalidateTag(`set-${setId}-products`);
+        revalidateTag(`set-${setId}-products`, {});
         revalidatePath(`/admin/sets/${setId}/edit`);
         return { success: true, message: `Product ${productId} added` };
 
@@ -113,12 +113,12 @@ export async function updateSet(
             throw error;
         }
 
-        revalidateTag('sets');
+        revalidateTag('sets', {});
         revalidatePath('/admin/sets');
         revalidatePath('/admin/home-design');
         revalidatePath('/');
         if(data?.slug){
-            revalidateTag(`set-${data.slug}`);
+            revalidateTag(`set-${data.slug}`, {});
             revalidatePath(`/set/${data.slug}`);
         }
 

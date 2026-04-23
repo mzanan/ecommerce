@@ -25,7 +25,7 @@ export async function deleteSetAction(setId: string): Promise<BaseActionResponse
         }
         if (!set) {
             console.warn(`[Server Action Warn] Delete Set: Set ${setId} not found (or already deleted). Revalidating anyway.`);
-            revalidateTag('sets');
+            revalidateTag('sets', {});
             revalidatePath('/admin/sets');
             return { success: true, message: 'Set already deleted or not found.' };
         }
@@ -66,11 +66,11 @@ export async function deleteSetAction(setId: string): Promise<BaseActionResponse
             return { success: false, error: `Failed to delete set: ${deleteSetError.message}` };
         }
 
-        revalidateTag('sets');
+        revalidateTag('sets', {});
         revalidatePath('/admin/sets');
         revalidatePath('/');
         if (setSlug) {
-            revalidateTag(`set-${setSlug}`);
+            revalidateTag(`set-${setSlug}`, {});
             revalidatePath(`/set/${setSlug}`);
         }
         return { success: true, message: 'Set deleted successfully' };

@@ -1,6 +1,8 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  reactCompiler: false,
+  turbopack: {},
   images: {
     remotePatterns: [
       {
@@ -22,15 +24,8 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-  webpack: (config, { isServer }) => {
-    if (isServer) {
-      config.externals = [...(Array.isArray(config.externals) ? config.externals : []), 'bcrypt'];
-    }
-    return config;
-  },
   serverExternalPackages: ['bcrypt'],
   experimental: {
-    reactCompiler: false,
     serverActions: {
       bodySizeLimit: '25mb',
     },

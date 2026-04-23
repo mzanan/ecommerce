@@ -52,7 +52,7 @@ export async function updateSetProductsAction(
             throw new Error(`Database transaction failed: ${transactionError.message}`);
         }
         
-        revalidateTag(`set-${setId}-products`);
+        revalidateTag(`set-${setId}-products`, {});
         revalidatePath(`/admin/sets/${setId}/edit`); 
 
         return { success: true, message: 'Product positions updated successfully.' };

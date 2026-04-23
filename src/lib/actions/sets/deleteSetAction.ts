@@ -32,11 +32,11 @@ export async function deleteSetAction(setId: string): Promise<ActionResponse> {
             return { success: false, error: `Failed to delete set: ${deleteError.message}` };
         }
 
-        revalidateTag('sets');
+        revalidateTag('sets', {});
         revalidatePath('/admin/sets');
         revalidatePath('/');
         if (setSlug) {
-            revalidateTag(`set-${setSlug}`);
+            revalidateTag(`set-${setSlug}`, {});
             revalidatePath(`/set/${setSlug}`);
         }
 

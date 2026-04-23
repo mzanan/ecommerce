@@ -26,8 +26,8 @@ export async function addProductToSetAction(
       return { success: false, error: `Database Error: ${error.message}` };
         }
 
-    revalidateTag(`set-products-${setId}`);
-    revalidateTag(`products`);
+    revalidateTag(`set-products-${setId}`, {});
+    revalidateTag(`products`, {});
 
     return { success: true, message: "Product added to set." };
 

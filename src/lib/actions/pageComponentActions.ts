@@ -66,7 +66,7 @@ export async function updatePageComponentOrder(updates: OrderUpdate[]): Promise<
             }
 
             revalidatePath('/');
-            revalidateTag('page-components');
+            revalidateTag('page-components', {});
             return { success: true, message: `Successfully updated order for ${successfulUpdates} components.` };
         }
 

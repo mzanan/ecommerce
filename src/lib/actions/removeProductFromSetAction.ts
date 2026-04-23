@@ -21,7 +21,7 @@ export async function removeProductFromSetAction(setId: string, productId: strin
             .delete().eq('set_id', setId).eq('product_id', productId);
         if (error) throw new Error(error.message);
 
-        revalidateTag(`set-${setId}-products`);
+        revalidateTag(`set-${setId}-products`, {});
         revalidatePath(`/admin/sets/${setId}/edit`);
         return { success: true, message: `Product ${productId} removed` };
 
