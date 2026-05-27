@@ -32,8 +32,9 @@ npx eslint src --max-warnings=9999   # Next 16 removió `next lint`; el script `
 - Validación de stock vive en `saveOrderAction` antes de insertar la orden.
 - Productos de Stripe se sincronizan a Supabase via `stripeSyncQueries`.
 - Animaciones: `import { motion } from "motion/react"` (NO `framer-motion`).
-- Videos: usar `src/components/LazyVideo/LazyVideo.tsx` en vez de `<video>` directo. Tiene `preload="none"` + IntersectionObserver con `rootMargin: 50%`.
+- Videos: usar `src/components/LazyVideo/LazyVideo.tsx` en vez de `<video>` directo. Tiene `preload="none"` + IntersectionObserver con `rootMargin: 50%`. Para above-the-fold (hero), pasar `eager` → arranca carga inmediata + `preload="auto"`, sin esperar al observer.
 - `react-icons`: namespace import (`import { FaX } from "react-icons/fa"`). Subpath no anda en v5; el tree-shake lo hace `optimizePackageImports`.
+- **NO usar `<link rel="preload" as="image">` manualmente para imágenes que ya van por `<Image>` de Next**. Borrado `ImagePreloader` 2026-05-28 — duplicaba la descarga: el `<link>` bajaba el original (Unsplash/Supabase) en paralelo a la versión optimizada de `/_next/image`, sumando 3.8MB en home. Next/Image + `loading="lazy"` para fold-down y `priority` para above-fold ya alcanza.
 
 ## Heurísticas
 
