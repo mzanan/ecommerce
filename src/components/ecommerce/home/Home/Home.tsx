@@ -6,7 +6,6 @@ import AboutSection from '@/components/ecommerce/home/AboutSection/AboutSection'
 import HeroImage from '@/components/ecommerce/home/HeroImage/HeroImage';
 import DisplaySets from '@/components/ecommerce/home/DisplaySets/DisplaySets';
 import { useHome } from './useHome';
-import { useImagePreloader, extractImageUrls } from '@/hooks/useImagePreloader';
 import type { HomeProps } from '@/types/home';
 
 export default function Home({
@@ -25,20 +24,6 @@ export default function Home({
   } = useHome(homepageItemsData);
 
   const heroImageUrl = heroContentData?.image_url;
-  const isImageUrl = (url: string) => /\.(jpe?g|png|webp|gif)$/i.test(url);
-
-  const allImageUrls = React.useMemo(() => {
-    const urls: string[] = [];
-
-    if (heroImageUrl && isImageUrl(heroImageUrl)) urls.push(heroImageUrl);
-
-    urls.push(...extractImageUrls(homepageItemsData));
-    urls.push(...extractImageUrls(aboutContentData));
-
-    return urls;
-  }, [heroImageUrl, homepageItemsData, aboutContentData]);
-
-  useImagePreloader(allImageUrls, { enabled: true, priority: true });
 
   const renderContentSections = () => {
     const whiteSection = (

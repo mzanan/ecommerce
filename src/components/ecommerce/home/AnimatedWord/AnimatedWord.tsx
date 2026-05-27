@@ -1,7 +1,7 @@
 'use client';
 
-import React from 'react'; 
-import { motion } from 'framer-motion';
+import React from 'react';
+import { motion } from 'motion/react';
 import { cn } from '@/lib/utils/cn';
 import { useAnimatedWord } from './useAnimatedWord';
 
@@ -29,12 +29,12 @@ export default function AnimatedWord({
 
     return (
         <motion.div
-            ref={textRef} 
+            ref={textRef}
             className="relative text-center cursor-pointer group"
             onClick={handleClick}
-            {...eventHandlers} 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            {...eventHandlers}
+            initial={{ y: -8 }}
+            animate={{ y: 0 }}
             transition={{ duration: 1.2, ease: "easeOut" }}
         >
             {/* Base Text Layer (Color determined by parent + mix-blend) */}

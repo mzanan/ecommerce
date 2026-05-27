@@ -4,14 +4,14 @@ Plataforma ecommerce real para una marca de streetwear ficticia. Contexto comple
 
 ## Stack
 
-Next 16 · React 19 · TypeScript · Tailwind v4 · Supabase (Postgres / Auth / RLS / Edge Functions) · Stripe · React Hook Form + Zod · Zustand · TanStack Table · dnd-kit · ffmpeg-static / fluent-ffmpeg.
+Next 16 · React 19 · TypeScript · Tailwind v4 · Supabase (Postgres / Auth / RLS / Edge Functions) · Stripe · React Hook Form + Zod · Zustand · TanStack Table · dnd-kit · ffmpeg-static / fluent-ffmpeg · `motion` (ex framer-motion).
 
 ## Comandos
 
 ```bash
 npm run dev
 npm run build
-npm run lint         # next lint
+npx eslint src --max-warnings=9999   # Next 16 removió `next lint`; el script `npm run lint` está obsoleto
 ```
 
 ## Paths críticos
@@ -31,6 +31,9 @@ npm run lint         # next lint
 - Email post-compra **no usa nodemailer**: se dispara desde un trigger SQL en Supabase. Si no llega un mail, la causa más probable es la config de Supabase Auth → SMTP en el dashboard.
 - Validación de stock vive en `saveOrderAction` antes de insertar la orden.
 - Productos de Stripe se sincronizan a Supabase via `stripeSyncQueries`.
+- Animaciones: `import { motion } from "motion/react"` (NO `framer-motion`).
+- Videos: usar `src/components/LazyVideo/LazyVideo.tsx` en vez de `<video>` directo. Tiene `preload="none"` + IntersectionObserver con `rootMargin: 50%`.
+- `react-icons`: namespace import (`import { FaX } from "react-icons/fa"`). Subpath no anda en v5; el tree-shake lo hace `optimizePackageImports`.
 
 ## Heurísticas
 

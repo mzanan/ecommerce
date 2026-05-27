@@ -11,7 +11,6 @@ import { cn } from "@/lib/utils/cn";
 import ReactQueryProvider from "@/components/providers/ReactQueryProvider";
 import { StoreProvider } from "@/components/providers/StoreProvider";
 import { OrganizationStructuredData, WebsiteStructuredData } from "@/components/seo/StructuredData";
-import ImagePreloader from "@/components/core/ImagePreloader/ImagePreloader";
 
 const geistSans = GeistSans;
 const geistMono = GeistMono;
@@ -45,23 +44,14 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    siteName: "night",
-    title: "night - Luxury Lingerie Collections",
+    siteName: "NOIRE",
+    title: "NOIRE - Luxury Lingerie Collections",
     description: "Luxury lingerie collections featuring elegant day and seductive night sets. Premium quality intimate apparel for the modern woman.",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "night Luxury Lingerie",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "night - Luxury Lingerie Collections",
+    title: "NOIRE - Luxury Lingerie Collections",
     description: "Luxury lingerie collections featuring elegant day and seductive night sets. Premium quality intimate apparel for the modern woman.",
-    images: ["/og-image.png"],
   },
 };
 
@@ -100,7 +90,6 @@ export default function RootLayout({
           <ScrollRestorationProvider>
             <StoreProvider>
               <ReactQueryProvider>
-              <ImagePreloader />
               <div>{children}</div>
               <Toaster richColors position="top-center" />
               </ReactQueryProvider>

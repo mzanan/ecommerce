@@ -29,6 +29,13 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: '25mb',
     },
+    optimizePackageImports: [
+      'react-icons',
+      'motion',
+      'lucide-react',
+      'embla-carousel-react',
+      'date-fns',
+    ],
   },
 };
 

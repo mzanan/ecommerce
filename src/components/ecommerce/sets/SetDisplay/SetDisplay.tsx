@@ -7,7 +7,6 @@ import { WheelScrollableArea } from '@/components/shared/WheelScrollableArea/Whe
 import type { SetPageProduct } from '@/lib/actions/setActions';
 import { useScrollRestorationContext } from '@/components/providers/ScrollRestorationProvider';
 import { useTheme } from 'next-themes';
-import { useImagePreloader, extractImageUrls } from '@/hooks/useImagePreloader';
 import {
   Carousel,
   CarouselContent,
@@ -100,12 +99,6 @@ export default function SetDisplay({ set }: SetDisplayProps) {
   const { setTheme } = useTheme();
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [currentSlide, setCurrentSlide] = useState(0);
-
-  const allImageUrls = useMemo(() => {
-    return extractImageUrls(set);
-  }, [set]);
-
-  useImagePreloader(allImageUrls, { enabled: true, priority: true });
 
   const displayImages = useMemo(() => {
     const sortedSetImages = set.set_images?.slice().sort((a, b) => (a.position ?? Infinity) - (b.position ?? Infinity)) || [];
