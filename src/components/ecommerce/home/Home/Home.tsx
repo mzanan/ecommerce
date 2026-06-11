@@ -53,7 +53,7 @@ export default function Home({
 
   return (
     <div className="overflow-x-hidden overflow-y-scroll w-full max-w-[100vw] snap-y snap-mandatory" style={{ height: '100vh' }}>
-      <HeroImage imageUrl={heroImageUrl} />
+      <HeroImage imageUrl={heroImageUrl} posterUrl="/images/Hero%20banner/1_DESK_poster.webp" />
 
       <PathSelector
         selectedType={selectedType}
