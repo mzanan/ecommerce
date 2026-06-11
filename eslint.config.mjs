@@ -6,8 +6,23 @@ import unusedImports from 'eslint-plugin-unused-imports';
 import nextPlugin from "@next/eslint-plugin-next";
 
 export default [
-  { 
-    ignores: ["node_modules/", ".next/", "dist/", "build/", "docs/"] 
+  {
+    ignores: ["node_modules/", ".next/", "dist/", "build/", "docs/"]
+  },
+  {
+    files: ["src/**/*.tsx"],
+    ignores: ["src/components/ui/**"],
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector:
+            "JSXOpeningElement[name.name=/^(button|a)$/] JSXAttribute[name.name='className'] Literal[value=/rounded-full/][value=/bg-white(?!\\S)/]",
+          message:
+            "Inline solid button/anchor styling: reuse <Pill variant=\"solid\"> (@/components/ui/Pill) instead of hand-written bg-white rounded-full classes.",
+        },
+      ],
+    },
   },
   {
     files: ["**/*.{js,mjs,cjs,ts,jsx,tsx}"],
