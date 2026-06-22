@@ -2,6 +2,7 @@
 
 import { createServerComponentClient } from '@/lib/supabase/server';
 import { createServerActionClient } from '@/lib/supabase/server';
+import { requireAdmin } from '@/lib/auth/serverAuth';
 import type { ActionResponse } from '@/types/actions';
 import type { UpdateSettingResult } from '@/types/settings';
 
@@ -34,6 +35,10 @@ export async function getSetting(key: string): Promise<ActionResponse<{ key: str
 
 
 export async function updateSetting(key: string, value: string): Promise<UpdateSettingResult> {
+    if (!(await requireAdmin())) {
+        return { success: false, error: 'Unauthorized.' };
+    }
+
     const supabase = createServerActionClient();
 
     try {

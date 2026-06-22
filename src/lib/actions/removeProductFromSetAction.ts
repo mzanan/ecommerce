@@ -3,6 +3,7 @@
 import { createServerActionClient } from '@/lib/supabase/server';
 import { revalidatePath, revalidateTag } from 'next/cache';
 import type { ActionResponse } from '@/types/actions';
+import { requireAdmin } from '@/lib/auth/serverAuth';
 
 /**
  * Removes a product from a specific set.
@@ -11,6 +12,9 @@ import type { ActionResponse } from '@/types/actions';
  * @returns ActionResponse indicating success or failure.
  */
 export async function removeProductFromSetAction(setId: string, productId: string): Promise<ActionResponse> {
+    if (!(await requireAdmin())) {
+        return { success: false, error: 'Unauthorized.' };
+    }
     if (!setId || !productId) {
         return { success: false, error: 'Set ID and Product ID are required.' };
     }

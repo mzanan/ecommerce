@@ -1,6 +1,7 @@
 "use server";
 
 import { createServerActionClient, createServerComponentClient } from "@/lib/supabase/server";
+import { requireAdmin } from '@/lib/auth/serverAuth';
 import { createProductSchema, updateProductSchema } from '@/lib/schemas/productSchema';
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { uploadProductImage } from '@/lib/helpers/storageHelpers';
@@ -27,6 +28,10 @@ export async function createProduct(
   prevState: ActionResponse | null,
   formData: FormData
 ): Promise<ActionResponse> {
+    if (!(await requireAdmin())) {
+        return { success: false, error: 'Unauthorized.' };
+    }
+
     const supabase = createServerActionClient();
     const bucketName = process.env.SUPABASE_BUCKET;
 
@@ -228,7 +233,11 @@ export async function updateProduct(
   productId: string,
   prevState: ActionResponse | null,
   formData: FormData
-): Promise<ActionResponse> { 
+): Promise<ActionResponse> {
+    if (!(await requireAdmin())) {
+        return { success: false, error: 'Unauthorized.' };
+    }
+
     const supabase = createServerActionClient();
     const bucketName = process.env.SUPABASE_BUCKET;
 
@@ -333,6 +342,10 @@ export async function updateProduct(
 }
 
 export async function deleteProduct(productId: string): Promise<ActionResponse> {
+    if (!(await requireAdmin())) {
+        return { success: false, error: 'Unauthorized.' };
+    }
+
     const supabase = createServerActionClient();
 
     if (!productId) {
@@ -543,6 +556,10 @@ export async function getProductBySlugAction(params: {
 export const getProductByIdForEdit = async (
     productId: string
 ): Promise<ProductByIdEditResponse> => {
+    if (!(await requireAdmin())) {
+        return { success: false, error: 'Unauthorized.' };
+    }
+
     const supabase = createServerComponentClient();
 
     try {

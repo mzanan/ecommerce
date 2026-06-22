@@ -3,8 +3,12 @@
 import { createServerActionClient } from "@/lib/supabase/server";
 import { revalidatePath, revalidateTag } from 'next/cache';
 import type { ActionResponse } from '@/types/actions';
+import { requireAdmin } from '@/lib/auth/serverAuth';
 
 export async function deleteSetAction(setId: string): Promise<ActionResponse> {
+    if (!(await requireAdmin())) {
+        return { success: false, error: 'Unauthorized.' };
+    }
     const supabase = createServerActionClient();
     let setSlug: string | null = null;
 

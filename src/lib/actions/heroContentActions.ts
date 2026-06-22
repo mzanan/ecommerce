@@ -4,6 +4,7 @@ import { createServerActionClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { heroContentFormSchema, HERO_CONTENT_ID } from '@/lib/schemas/heroSchema';
 import { uploadHeroImage, deleteHeroImage, getStoragePathFromUrl } from '@/lib/helpers/storageHelpers';
+import { requireAdmin } from '@/lib/auth/serverAuth';
 import type { ActionResponse } from '@/types/actions';
 import type { HeroDbRow } from '@/types/hero';
 
@@ -11,6 +12,10 @@ export async function upsertHeroContentAction(
   prevState: ActionResponse<HeroDbRow> | null,
   formData: FormData
 ): Promise<ActionResponse<HeroDbRow>> {
+  if (!(await requireAdmin())) {
+    return { success: false, error: 'Unauthorized.' };
+  }
+
   const supabase = await createServerActionClient();
   const bucketName = process.env.SUPABASE_BUCKET;
 

@@ -3,13 +3,18 @@
 import { createServerActionClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { deleteHeroImage, getStoragePathFromUrl } from '@/lib/helpers/storageHelpers';
+import { requireAdmin } from '@/lib/auth/serverAuth';
 import { HERO_CONTENT_ID } from '@/lib/schemas/heroSchema';
 import type { ActionResponse } from '@/types/actions';
 import type { HeroDbRow } from '@/types/hero';
 
 export async function deleteHeroImageAction(): Promise<ActionResponse<HeroDbRow>> {
+  if (!(await requireAdmin())) {
+    return { success: false, error: 'Unauthorized.' };
+  }
+
   console.log('[HERO DELETE] Starting hero image deletion');
-  
+
   const supabase = await createServerActionClient();
   const bucketName = process.env.SUPABASE_BUCKET;
 

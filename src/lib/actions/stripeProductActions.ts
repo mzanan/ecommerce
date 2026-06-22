@@ -2,6 +2,7 @@
 
 import Stripe from 'stripe';
 import { createServiceRoleClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/auth/serverAuth";
 import type { ActionResponse } from '@/types/actions';
 import type { 
   StripeProductSyncResult, 
@@ -16,11 +17,12 @@ if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('STRIPE_SECRET_KEY is not set in environment variables');
 }
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-04-30.basil' as any,
-});
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export async function syncProductToStripe(productId: string): Promise<ActionResponse<StripeProductSyncResult>> {
+  if (!(await requireAdmin())) {
+    return { success: false, error: 'Unauthorized' };
+  }
   const supabase = createServiceRoleClient();
   
   try {
@@ -105,6 +107,9 @@ export async function syncVariantPricesToStripe(
   productId: string,
   stripeProductIdFromSync?: string
 ): Promise<ActionResponse<StripeVariantSyncResult>> {
+  if (!(await requireAdmin())) {
+    return { success: false, error: 'Unauthorized' };
+  }
   const supabase = createServiceRoleClient();
   
   try {
@@ -227,6 +232,9 @@ export async function syncVariantPricesToStripe(
 
 
 export async function syncAllProductsToStripe(): Promise<ActionResponse<StripeAllProductsSyncResult>> {
+  if (!(await requireAdmin())) {
+    return { success: false, error: 'Unauthorized' };
+  }
   const supabase = createServiceRoleClient();
   
   try {
@@ -285,6 +293,9 @@ export async function syncAllProductsToStripe(): Promise<ActionResponse<StripeAl
 }
 
 export async function getBulkProductSyncStatus(productIds: string[]): Promise<ActionResponse<Record<string, StripeProductSyncStatus>>> {
+  if (!(await requireAdmin())) {
+    return { success: false, error: 'Unauthorized' };
+  }
   const supabase = createServiceRoleClient();
   
   try {
@@ -392,6 +403,9 @@ export async function getBulkProductSyncStatus(productIds: string[]): Promise<Ac
 }
 
 export async function getProductSyncStatus(productId: string): Promise<ActionResponse<StripeProductSyncStatus>> {
+  if (!(await requireAdmin())) {
+    return { success: false, error: 'Unauthorized' };
+  }
   const supabase = createServiceRoleClient();
   
   try {
@@ -456,8 +470,11 @@ export async function getProductSyncStatus(productId: string): Promise<ActionRes
 
 export async function getStripeProductsList(params?: { 
   limit?: number; 
-  offset?: number; 
+  offset?: number;
 }): Promise<ActionResponse<StripeProductsListResult>> {
+  if (!(await requireAdmin())) {
+    return { success: false, error: 'Unauthorized' };
+  }
   try {
     let allProducts: Stripe.Product[] = [];
     let hasMore = true;
@@ -516,6 +533,9 @@ export async function getStripeProductsList(params?: {
 }
 
 export async function cleanupInactiveStripeProducts(): Promise<ActionResponse<StripeCleanupResult>> {
+  if (!(await requireAdmin())) {
+    return { success: false, error: 'Unauthorized' };
+  }
   const supabase = createServiceRoleClient();
   
   try {

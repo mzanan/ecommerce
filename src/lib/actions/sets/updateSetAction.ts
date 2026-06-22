@@ -9,6 +9,7 @@ import type { SetImageRow } from '@/types/setActions';
 import type { Database } from '@/types/supabase';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { v4 as uuidv4 } from 'uuid';
+import { requireAdmin } from '@/lib/auth/serverAuth';
 
 async function handleSetImageUploads(
     supabase: SupabaseClient<Database>,
@@ -161,6 +162,9 @@ export async function updateSetAction(
     prevState: ActionResponse | null,
     formData: FormData
 ): Promise<ActionResponse<{id: string}>> {
+    if (!(await requireAdmin())) {
+        return { success: false, error: 'Unauthorized.' };
+    }
     if (!setId) return { success: false, error: 'Set ID is missing.' };
     
     const supabase = createServerActionClient();

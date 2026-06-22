@@ -2,7 +2,8 @@
 
 import { createServerActionClient } from "@/lib/supabase/server";
 import { revalidatePath, revalidateTag } from "next/cache";
-import type { PageComponentUpdate, PageComponentContent } from "@/types/db"; 
+import { requireAdmin } from '@/lib/auth/serverAuth';
+import type { PageComponentUpdate, PageComponentContent } from "@/types/db";
 import { type ActionResponse } from "@/types/actions";
 import type { OrderUpdate } from "@/types/pageComponent";
 
@@ -17,6 +18,9 @@ async function verifyAdmin(supabase: ReturnType<typeof createServerActionClient>
 }
 
 export async function updatePageComponentOrder(updates: OrderUpdate[]): Promise<ActionResponse> {
+    if (!(await requireAdmin())) {
+        return { success: false, message: 'Unauthorized.' };
+    }
     if (!updates || updates.length === 0) {
         return { success: true, message: "No updates provided." };
     }

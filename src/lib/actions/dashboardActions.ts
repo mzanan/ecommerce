@@ -2,10 +2,15 @@
 
 import { createServerActionClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
+import { requireAdmin } from '@/lib/auth/serverAuth';
 import type { SaleOrder } from '@/types/dashboard';
 import type { ActionResponse } from '@/types/actions';
 
 export async function updateOrderStatusAction(formData: FormData): Promise<ActionResponse> {
+  if (!(await requireAdmin())) {
+    return { success: false, error: 'Unauthorized.' };
+  }
+
   const orderId = formData.get('orderId') as string;
   const newStatus = formData.get('newStatus') as SaleOrder['shipping_status'];
   const currentStatus = formData.get('currentStatus') as SaleOrder['shipping_status'];
@@ -76,8 +81,12 @@ export async function updateOrderStatusAction(formData: FormData): Promise<Actio
 }
 
 export async function syncStuckOrdersAction(): Promise<ActionResponse> {
+  if (!(await requireAdmin())) {
+    return { success: false, error: 'Unauthorized.' };
+  }
+
   const supabase = createServerActionClient();
-  
+
   try {
     const { error: syncError } = await supabase.functions.invoke('auto-sync-orders', {
       body: {}

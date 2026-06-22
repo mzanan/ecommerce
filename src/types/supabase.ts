@@ -275,6 +275,33 @@ export type Database = {
         }
         Relationships: []
       }
+      pending_orders: {
+        Row: {
+          created_at: string
+          items: Json
+          payment_intent_id: string
+          shipping: Json
+          shipping_price: number
+          total_amount: number
+        }
+        Insert: {
+          created_at?: string
+          items: Json
+          payment_intent_id: string
+          shipping: Json
+          shipping_price?: number
+          total_amount: number
+        }
+        Update: {
+          created_at?: string
+          items?: Json
+          payment_intent_id?: string
+          shipping?: Json
+          shipping_price?: number
+          total_amount?: number
+        }
+        Relationships: []
+      }
       page_components: {
         Row: {
           affiliation: string
@@ -599,6 +626,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_order_from_payment: {
+        Args: { p_payment_intent_id: string }
+        Returns: string
+      }
       setup_sync_settings: {
         Args: Record<PropertyKey, never>
         Returns: undefined

@@ -4,6 +4,7 @@ import { createServerActionClient } from "@/lib/supabase/server";
 import { revalidatePath, revalidateTag } from 'next/cache';
 import type { ActionResponse as BaseActionResponse } from '@/types/actions'; 
 import type { ProductPositionData } from '@/types/sets';
+import { requireAdmin } from '@/lib/auth/serverAuth';
 
 /**
  * Updates the positions of products within a set.
@@ -17,6 +18,9 @@ export async function updateSetProductsAction(
     setId: string,
     productsJson: string
 ): Promise<BaseActionResponse> {
+    if (!(await requireAdmin())) {
+        return { success: false, error: 'Unauthorized.' };
+    }
     const supabase = createServerActionClient();
 
     if (!setId) {

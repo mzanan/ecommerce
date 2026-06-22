@@ -3,11 +3,15 @@
 import { createServerActionClient } from '@/lib/supabase/server';
 import { categoryFormSchema, type CategoryFormData } from '@/lib/schemas/categorySchema';
 import { revalidatePath } from 'next/cache';
-import { verifyAdmin } from '@/lib/auth/serverAuth';
+import { verifyAdmin, requireAdmin } from '@/lib/auth/serverAuth';
 import type { ProductCategoryRow } from '@/types/category';
 import type { ActionResponse } from '@/types/actions';
 
 export async function createCategoryAction(formData: CategoryFormData): Promise<ActionResponse<ProductCategoryRow>> {
+  if (!(await requireAdmin())) {
+    return { success: false, error: 'Unauthorized.' };
+  }
+
   const validationResult = categoryFormSchema.safeParse(formData);
 
   if (!validationResult.success) {
@@ -61,6 +65,10 @@ export async function updateCategoryAction(
     categoryId: string, 
   formData: CategoryFormData
 ): Promise<ActionResponse<ProductCategoryRow>> {
+  if (!(await requireAdmin())) {
+    return { success: false, error: 'Unauthorized.' };
+  }
+
   const validationResult = categoryFormSchema.safeParse(formData);
 
   if (!validationResult.success) {
