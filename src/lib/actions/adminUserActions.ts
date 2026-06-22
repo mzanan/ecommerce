@@ -2,6 +2,7 @@
 
 import { createClient } from '@supabase/supabase-js'
 import { revalidatePath } from 'next/cache'
+import { requireAdmin } from '@/lib/auth/serverAuth';
 import type { AdminUserActionResult } from '@/types/adminUser';
 
 function createAdminClient() {
@@ -24,6 +25,10 @@ export async function createAdminUserAction(
   prevState: AdminUserActionResult | null,
   formData: FormData,
 ): Promise<AdminUserActionResult> {
+  if (!(await requireAdmin())) {
+    return { success: false, message: 'Unauthorized.' }
+  }
+
   const supabaseAdmin = createAdminClient()
 
   const email = formData.get('email') as string

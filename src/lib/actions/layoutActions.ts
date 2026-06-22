@@ -2,9 +2,13 @@
 
 import { createServerActionClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { requireAdmin } from '@/lib/auth/serverAuth';
 import type { HomepageLayoutRow } from '@/types/db';
 
 export async function updateHomepageLayoutOrder(items: { item_id: string; display_order: number; item_type: 'page_component' | 'set'; page_path: string }[]): Promise<{ success: boolean, message?: string }> {
+    if (!(await requireAdmin())) {
+        return { success: false, message: 'Unauthorized.' };
+    }
     const supabase = createServerActionClient();
 
     if (!items || items.length === 0) {
@@ -41,6 +45,9 @@ export async function updateHomepageLayoutOrder(items: { item_id: string; displa
 }
 
 export async function syncHomepageLayout(pagePath: string = '/'): Promise<{ success: boolean, message?: string, addedCount?: number, removedCount?: number }> {
+    if (!(await requireAdmin())) {
+        return { success: false, message: 'Unauthorized.' };
+    }
     const supabase = createServerActionClient();
     let addedCount = 0;
 

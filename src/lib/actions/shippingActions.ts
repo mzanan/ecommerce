@@ -2,11 +2,15 @@
 
 import { createServerActionClient } from "@/lib/supabase/server";
 import { revalidatePath } from 'next/cache';
+import { requireAdmin } from '@/lib/auth/serverAuth';
 import type { ShippingActionResult } from '@/types/shipping';
 
 export async function deleteShippingPriceAction(id: number): Promise<ShippingActionResult> {
+    if (!(await requireAdmin())) {
+        return { success: false, message: 'Unauthorized.' };
+    }
     const supabase = createServerActionClient();
-    
+
     if (!id) {
         return { success: false, message: "No ID provided for deletion." };
     }
@@ -26,6 +30,9 @@ export async function deleteShippingPriceAction(id: number): Promise<ShippingAct
 }
 
 export async function upsertShippingPriceAction(formData: FormData): Promise<ShippingActionResult> {
+    if (!(await requireAdmin())) {
+        return { success: false, message: 'Unauthorized.' };
+    }
     const supabase = createServerActionClient();
 
     const idString = formData.get('id') as string | null;
@@ -93,8 +100,11 @@ export async function upsertShippingPriceAction(formData: FormData): Promise<Shi
 }
 
 export async function updateDefaultShippingPrice(price: number): Promise<ShippingActionResult> {
+    if (!(await requireAdmin())) {
+        return { success: false, message: 'Unauthorized.' };
+    }
     const supabase = createServerActionClient();
-    
+
     const { error } = await supabase
         .from('app_settings')
         .upsert({

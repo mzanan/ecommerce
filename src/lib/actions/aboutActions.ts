@@ -2,6 +2,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from '@/types/supabase';
+import { requireAdmin } from '@/lib/auth/serverAuth';
 import { uploadAboutImage, deleteFileByPath, getStoragePathFromUrl } from '@/lib/helpers/storageHelpers';
 import type { AboutContentData, UploadedImageInfo } from '@/types/about';
 import { APP_SETTINGS_ABOUT_KEY } from '@/lib/constants/home';
@@ -53,6 +54,9 @@ export async function fetchAboutContentAction(): Promise<{ data: AboutContentDat
 export async function saveAboutContentAction(
     formData: FormData
 ): Promise<{ success: boolean; error: string | null; data?: AboutContentData }> {
+    if (!(await requireAdmin())) {
+        return { success: false, error: 'Unauthorized.' };
+    }
 
     const supabase = getSupabaseAdminClient();
     let uploadedImagePathsToRollback: string[] = [];

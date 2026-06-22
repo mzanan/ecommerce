@@ -1,118 +1,114 @@
 'use server';
 
-import { createServiceRoleClient } from '@/lib/supabase/server';
-import type { SaveOrderParams, SaveOrderResponse } from '@/types/order';
-import { validateCartStockAction } from '@/lib/actions/stockActions';
+import Stripe from 'stripe';
+import { z } from 'zod';
+import { createServerActionClient, createServiceRoleClient } from '@/lib/supabase/server';
+import { priceCartFromDb, getShippingPriceFromDb } from './pricing';
+import { addressSchema } from '@/lib/schemas/checkoutSchemas';
+import type { AddressFormValues } from '@/types/checkout';
+import type { OrderItemDetail } from '@/types/stripe';
+import type { Json } from '@/types/supabase';
 
-export async function saveOrderAction(params: SaveOrderParams): Promise<SaveOrderResponse> {
-  const supabase = createServiceRoleClient();
-  
-  try {
-    const stockValidation = await validateCartStockAction(
-      params.items.map(item => ({
-        productId: item.productId,
-        variantId: item.variantId,
-        quantity: item.quantity
-      }))
-    );
+if (!process.env.STRIPE_SECRET_KEY) {
+  throw new Error('STRIPE_SECRET_KEY is not set in environment variables');
+}
 
-    if (!stockValidation.success) {
-      return { error: stockValidation.error || 'Failed to validate stock' };
-    }
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
-    if (!stockValidation.data?.isValid) {
-      const invalidItems = stockValidation.data?.stockValidation.filter(item => !item.isValid) || [];
-      const errorMessages = invalidItems.map(item => item.errorMessage).join(', ');
-      return { error: `Stock validation failed: ${errorMessages}` };
-    }
+const itemSchema = z.object({
+  variantId: z.string().min(1),
+  productId: z.string().min(1),
+  quantity: z.number().int().positive(),
+  priceAtPurchase: z.number().nonnegative(),
+  size: z.string().nullable(),
+  name: z.string().optional(),
+});
 
-    const productsTotal = params.items.reduce((sum, item) => sum + (item.quantity * item.priceAtPurchase), 0);
-    const shippingPrice = params.shippingPrice || 0;
+const pendingOrderSchema = z.object({
+  paymentIntentId: z.string().min(1),
+  shippingAddress: addressSchema,
+  items: z.array(itemSchema).min(1),
+});
 
-    const expectedTotal = productsTotal + shippingPrice;
-    if (Math.abs(params.totalAmount - expectedTotal) > 0.01) {
-      console.warn('[SAVE ORDER] Total amount mismatch!', {
-        provided: params.totalAmount,
-        calculated: expectedTotal,
-        difference: params.totalAmount - expectedTotal
-      });
-    }
+export interface CreatePendingOrderResponse {
+  success?: boolean;
+  error?: string;
+}
 
-    const orderItems = [];
-    for (const item of params.items) {
-      const { data: variantData } = await supabase
-        .from('product_variants')
-        .select('product_id, products (name)')
-        .eq('id', item.variantId)
-        .single();
-
-      const productName = variantData?.products?.name || item.name || 'Unknown Product';
-      
-      orderItems.push({
-        product_variant_id: item.variantId,
-        product_id: item.productId,
-        quantity: item.quantity,
-        price_at_purchase: item.priceAtPurchase,
-        size: item.size,
-        product_name: productName
-      });
-    }
-
-    const orderDetails = {
-      items: orderItems,
-      shipping_price: shippingPrice
-    };
-
-    const { data: orderData, error: orderError } = await supabase
-      .from('orders')
-      .insert({
-        shipping_name: params.shippingAddress.name,
-        shipping_email: params.shippingAddress.email,
-        shipping_phone: params.shippingAddress.phone,
-        shipping_address1: params.shippingAddress.address1,
-        shipping_address2: params.shippingAddress.address2 || '',
-        shipping_city: params.shippingAddress.city,
-        shipping_state: params.shippingAddress.state,
-        shipping_postal_code: params.shippingAddress.postalCode,
-        shipping_country: params.shippingAddress.country,
-        total_amount: params.totalAmount,
-        payment_intent_id: params.paymentIntentId,
-        status: 'paid',
-        shipping_status: 'pending',
-        order_details: orderDetails
-      })
-      .select('id')
-      .single();
-
-    if (orderError) {
-      console.error('[SAVE ORDER] Error creating order:', orderError);
-      return { error: `Failed to create order: ${orderError.message}` };
-    }
-
-    const orderItemsToInsert = orderItems.map(detail => ({
-      order_id: orderData.id,
-      product_variant_id: detail.product_variant_id,
-      quantity: detail.quantity,
-      price_at_purchase: detail.price_at_purchase,
-      product_name: detail.product_name,
-      product_size: detail.size
-    }));
-
-    const { error: orderItemsError } = await supabase
-      .from('order_items')
-      .insert(orderItemsToInsert);
-
-    if (orderItemsError) {
-      console.error('[SAVE ORDER] Error creating order items:', orderItemsError);
-    }
-
-    return { 
-      orderId: orderData.id,
-      userEmail: params.shippingAddress.email
-    };
-
-  } catch (error: any) {
-            console.error('[SAVE ORDER] Unexpected error:', error);
-        return { error: error.message || 'Failed to save order due to database or validation error.' };
+/**
+ * Records a SERVER-VALIDATED order draft for a PaymentIntent, to be finalized by
+ * the Stripe webhook. Prices are re-derived from the DB and the PaymentIntent's
+ * amount must match the recomputed total exactly — the client cannot dictate price
+ * or fabricate an order. The webhook (payment_intent.succeeded) is the authoritative
+ * writer; this only stages the data.
+ */
+export async function createPendingOrderAction(input: {
+  paymentIntentId: string;
+  shippingAddress: AddressFormValues;
+  items: OrderItemDetail[];
+}): Promise<CreatePendingOrderResponse> {
+  const parsed = pendingOrderSchema.safeParse(input);
+  if (!parsed.success) {
+    return { error: 'Invalid order data.' };
   }
-} 
+  const { paymentIntentId, shippingAddress, items } = parsed.data;
+
+  // 1. The PaymentIntent must be a real Stripe intent (created by our server).
+  let paymentIntent: Stripe.PaymentIntent;
+  try {
+    paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+  } catch {
+    return { error: 'Payment session not found.' };
+  }
+
+  const supabase = createServerActionClient();
+
+  // 2. Authoritative re-pricing from the DB (line prices + shipping for the country).
+  const priced = await priceCartFromDb(supabase, items);
+  if (priced.error || !priced.data) {
+    return { error: priced.error || 'Failed to price cart.' };
+  }
+  const shippingPrice = await getShippingPriceFromDb(supabase, shippingAddress.country);
+  const totalAmount = priced.data.subtotal + shippingPrice;
+  const expectedCents = Math.round(totalAmount * 100);
+
+  // 3. The charge amount MUST equal the server-recomputed total. Reject mismatches
+  //    (tampering, or the cart/shipping changed after the intent was created).
+  if (paymentIntent.amount !== expectedCents) {
+    console.error('[pending-order] amount mismatch', {
+      intent: paymentIntent.amount,
+      expected: expectedCents,
+    });
+    return { error: 'Order total has changed. Please refresh and try again.' };
+  }
+
+  // 4. Stage the validated draft. pending_orders is RLS-locked to the server.
+  const service = createServiceRoleClient();
+  const { error } = await service.from('pending_orders').upsert(
+    {
+      payment_intent_id: paymentIntentId,
+      shipping: {
+        name: shippingAddress.name,
+        email: shippingAddress.email,
+        phone: shippingAddress.phone ?? null,
+        address1: shippingAddress.address1,
+        address2: shippingAddress.address2 ?? '',
+        city: shippingAddress.city,
+        state: shippingAddress.state ?? null,
+        postalCode: shippingAddress.postalCode,
+        country: shippingAddress.country,
+      },
+      items: priced.data.items as unknown as Json,
+      shipping_price: shippingPrice,
+      total_amount: totalAmount,
+    },
+    { onConflict: 'payment_intent_id' },
+  );
+
+  if (error) {
+    console.error('[pending-order] failed to persist draft:', error.message);
+    return { error: 'Could not prepare your order. Please try again.' };
+  }
+
+  return { success: true };
+}

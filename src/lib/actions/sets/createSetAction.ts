@@ -8,11 +8,15 @@ import { createSetFormSchema } from '@/lib/schemas/setSchema';
 import type { ActionResponse } from '@/types/actions';
 import type { SetRow } from '@/types/db';
 import type { UploadedSetImageInfo } from '@/types/setActions';
+import { requireAdmin } from '@/lib/auth/serverAuth';
 
 export async function createSetAction(
     prevState: ActionResponse | null,
     formData: FormData
 ): Promise<ActionResponse<SetRow>> {
+    if (!(await requireAdmin())) {
+        return { success: false, error: 'Unauthorized.' };
+    }
     const supabase = createServerActionClient();
     let uploadedImagePathsToRollback: string[] = [];
     

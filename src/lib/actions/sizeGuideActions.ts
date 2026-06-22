@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { createServerActionClient } from '@/lib/supabase/server';
+import { requireAdmin } from '@/lib/auth/serverAuth';
 import { sizeGuideTemplateStorageSchema } from '@/lib/schemas/sizeGuideTemplateSchema';
 import type { ActionResponse } from '@/types/actions';
 import type { FetchDataParams } from '@/types/adminDataTable';
@@ -26,6 +27,9 @@ export async function createSizeGuideTemplate(
     prevState: ActionResponse | null, 
     formData: FormData
 ): Promise<ActionResponse> {
+    if (!(await requireAdmin())) {
+        return { success: false, message: 'Unauthorized.' };
+    }
     const supabase = createServerActionClient();
 
     let rawData: any = {};
@@ -42,8 +46,8 @@ export async function createSizeGuideTemplate(
 
     if (!validatedFields.success) {
         console.error('Validation Error:', validatedFields.error.flatten().fieldErrors);
-        return { 
-            success: false, 
+        return {
+            success: false,
             message: 'Validation failed. Please check the fields.',
             error: JSON.stringify(validatedFields.error.flatten().fieldErrors)
         };
@@ -77,6 +81,9 @@ export async function updateSizeGuideTemplate(
     prevState: ActionResponse | null,
     formData: FormData
 ): Promise<ActionResponse> {
+     if (!(await requireAdmin())) {
+        return { success: false, message: 'Unauthorized.' };
+     }
      if (!id) return { success: false, message: 'Template ID is missing.' };
 
     const supabase = createServerActionClient();
@@ -155,8 +162,11 @@ export async function getSizeGuideTemplateById(id: string): Promise<ActionRespon
 }
 
 export async function deleteSizeGuideTemplate(id: string): Promise<ActionResponse> {
+    if (!(await requireAdmin())) {
+        return { success: false, message: 'Unauthorized.' };
+    }
     if (!id) return { success: false, message: 'Template ID is missing.' };
-    
+
     const supabase = createServerActionClient();
 
     const { data: categoriesUsing, error: categoriesCheckError } = await supabase

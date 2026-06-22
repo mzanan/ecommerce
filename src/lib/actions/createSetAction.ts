@@ -7,10 +7,14 @@ import { uploadCollectionImage, deleteCollectionImage } from '@/lib/helpers/stor
 import slugify from 'slugify';
 import type { ActionResponse as BaseActionResponse } from '@/types/actions';
 import type { SetRow } from '@/types/db';
+import { requireAdmin } from '@/lib/auth/serverAuth';
 
 export async function createSetAction(
     formData: FormData
 ): Promise<BaseActionResponse<SetRow>> {
+    if (!(await requireAdmin())) {
+        return { success: false, error: 'Unauthorized.' };
+    }
     const supabase = createServerActionClient();
 
     const { data: session } = await supabase.auth.getSession();

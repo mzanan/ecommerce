@@ -4,8 +4,12 @@ import { createServerActionClient } from "@/lib/supabase/server";
 import { revalidatePath, revalidateTag } from 'next/cache';
 import type { ActionResponse as BaseActionResponse } from '@/types/actions';
 import { deleteCollectionImage } from '@/lib/helpers/storageHelpers';
+import { requireAdmin } from '@/lib/auth/serverAuth';
 
 export async function deleteSetAction(setId: string): Promise<BaseActionResponse> {
+    if (!(await requireAdmin())) {
+        return { success: false, error: 'Unauthorized.' };
+    }
     const supabase = createServerActionClient();
     let setSlug: string | null = null;
 

@@ -2,10 +2,14 @@
 
 import { createServerActionClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { requireAdmin } from '@/lib/auth/serverAuth';
 
 export async function upsertShippingPriceAction(formData: FormData): Promise<{success: boolean, message: string}> {
+  if (!(await requireAdmin())) {
+    return { success: false, message: 'Unauthorized.' };
+  }
   const supabase = createServerActionClient();
-  
+
   try {
     const countryCode = formData.get('country_code') as string;
     const countryName = formData.get('country_name') as string;
@@ -39,8 +43,11 @@ export async function upsertShippingPriceAction(formData: FormData): Promise<{su
 }
 
 export async function deleteShippingPriceAction(id: number): Promise<{success: boolean, message: string}> {
+  if (!(await requireAdmin())) {
+    return { success: false, message: 'Unauthorized.' };
+  }
   const supabase = createServerActionClient();
-  
+
   try {
     const { error } = await supabase
       .from('country_shipping_prices')
@@ -60,8 +67,11 @@ export async function deleteShippingPriceAction(id: number): Promise<{success: b
 }
 
 export async function updateDefaultShippingPrice(price: number): Promise<{success: boolean, message: string}> {
+  if (!(await requireAdmin())) {
+    return { success: false, message: 'Unauthorized.' };
+  }
   const supabase = createServerActionClient();
-  
+
   try {
     const { error } = await supabase
       .from('app_settings')

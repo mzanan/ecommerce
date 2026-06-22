@@ -3,11 +3,15 @@
 import { createServerActionClient } from "@/lib/supabase/server";
 import { revalidateTag } from "next/cache";
 import type { ActionResponse } from "@/types/actions";
+import { requireAdmin } from '@/lib/auth/serverAuth';
 
 export async function addProductToSetAction(
   setId: string,
   productId: string
 ): Promise<ActionResponse> {
+    if (!(await requireAdmin())) {
+        return { success: false, error: 'Unauthorized.' };
+    }
     const supabase = createServerActionClient();
 
     if (!setId || !productId) {
