@@ -26,15 +26,6 @@
     "paths": {
       "@/*": [
         "./src/*"
-      ],
-      "@payload-config": [
-        "./payload.config.ts"
-      ],
-      "payload": [
-        "./node_modules/payload"
-      ],
-      "payload/*": [
-        "./node_modules/payload/*"
       ]
     }
   },

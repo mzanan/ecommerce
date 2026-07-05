@@ -6,9 +6,7 @@ import slugify from 'slugify';
 import type { ActionResponse } from '@/types/actions';
 import type { SetRow } from '@/types/db';
 import type { SelectOption } from '@/types/ui';
-import type { Database } from '@/types/supabase';
-import type { SupabaseClient } from '@supabase/supabase-js';
-import { requireAdmin } from '@/lib/auth/serverAuth';
+import { requireAdmin, verifyAdmin } from '@/lib/auth/serverAuth';
 
 export async function addProductToSet(setId: string, productId: string): Promise<ActionResponse> {
     if (!(await requireAdmin())) {
@@ -64,16 +62,6 @@ export async function getSetsForSelection(): Promise<ActionResponse<{ sets: Sele
         const message = err instanceof Error ? err.message : 'Unknown error fetching sets';
         return { success: false, error: message };
     }
-}
-
-async function verifyAdmin(supabase: SupabaseClient<Database>): Promise<boolean> {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return false;
-    const { count } = await supabase
-        .from('admin_users')
-        .select('* ', { count: 'exact', head: true })
-        .eq('id', user.id);
-    return count === 1;
 }
 
 export async function updateSet(
