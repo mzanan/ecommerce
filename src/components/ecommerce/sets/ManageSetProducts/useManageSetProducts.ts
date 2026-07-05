@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import type { ActionResponse } from '@/types/actions';
 import type { ProductWithPosition } from '@/types/db';
 import type { AvailableProductsResult } from '@/types/sets';
-import { addProductToSetAction } from '@/lib/actions/addProductToSetAction';
+import { addProductToSet } from '@/lib/actions/sets';
 import { removeProductFromSetAction } from '@/lib/actions/removeProductFromSetAction';
 import { getAvailableProductsForSetAction, getProductsInSetAction } from '@/lib/queries/setQueries.server';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -124,7 +124,7 @@ export function useManageSetProducts(setId: string, initialAssociatedProducts?: 
     }, []);
 
     const addMutation = useMutation<ActionResponse, Error, string>({
-        mutationFn: (productId: string) => addProductToSetAction(setId, productId),
+        mutationFn: (productId: string) => addProductToSet(setId, productId),
         onSuccess: (result) => {
                 if (result.success) {
                 toast.success('Product added to set');

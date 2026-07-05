@@ -2,20 +2,10 @@
 
 import { createServerActionClient } from "@/lib/supabase/server";
 import { revalidatePath, revalidateTag } from "next/cache";
-import { requireAdmin } from '@/lib/auth/serverAuth';
+import { requireAdmin, verifyAdmin } from '@/lib/auth/serverAuth';
 import type { PageComponentUpdate, PageComponentContent } from "@/types/db";
 import { type ActionResponse } from "@/types/actions";
 import type { OrderUpdate } from "@/types/pageComponent";
-
-async function verifyAdmin(supabase: ReturnType<typeof createServerActionClient>): Promise<boolean> {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return false;
-    const { count } = await supabase
-        .from('admin_users')
-        .select('* ', { count: 'exact', head: true })
-        .eq('id', user.id);
-    return count === 1;
-}
 
 export async function updatePageComponentOrder(updates: OrderUpdate[]): Promise<ActionResponse> {
     if (!(await requireAdmin())) {

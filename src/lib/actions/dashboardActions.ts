@@ -32,14 +32,19 @@ export async function updateOrderStatusAction(formData: FormData): Promise<Actio
   }
 
   const supabase = createServerActionClient();
-  const { error: updateError } = await supabase
+  const { error: updateError, count } = await supabase
     .from('orders')
-    .update({ shipping_status: newStatus, updated_at: new Date().toISOString() })
-    .eq('id', orderId);
+    .update({ shipping_status: newStatus, updated_at: new Date().toISOString() }, { count: 'exact' })
+    .eq('id', orderId)
+    .eq('shipping_status', currentStatus);
 
   if (updateError) {
     console.error('Error updating order status:', updateError.message);
     return { success: false, error: `Failed to update order status: ${updateError.message}` };
+  }
+
+  if (!count) {
+    return { success: true, message: `Order already ${newStatus}` };
   }
 
   let emailTypeForFunction: 'order_in_transit' | 'order_delivered' | null = null;

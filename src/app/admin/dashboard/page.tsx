@@ -17,7 +17,7 @@ import { ShippingActionButtons } from '@/components/admin/buttons/ShippingAction
 import { SyncOrdersButton } from '@/components/admin/buttons/SyncOrdersButton/SyncOrdersButton';
 import { SortableTableHead } from '@/components/admin/data-table/SortableTableHead/SortableTableHead';
 import { createServerActionClient } from '@/lib/supabase/server';
-import { syncStuckOrdersAction, updateOrderStatusAction } from './actions';
+import { syncStuckOrdersAction, updateOrderStatusAction } from '@/lib/actions/dashboardActions';
 import { generateMetadata } from '@/lib/utils/seo';
 import { SOCIAL_LINKS } from '@/lib/constants/social';
 
@@ -105,7 +105,12 @@ async function DashboardContent({ searchParams }: { searchParams: Promise<Search
           <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
           <p className="text-muted-foreground">Welcome to your Noire admin dashboard</p>
         </div>
-        <form action={syncStuckOrdersAction}>
+        <form
+          action={async () => {
+            'use server';
+            await syncStuckOrdersAction();
+          }}
+        >
           <SyncOrdersButton />
         </form>
       </div>
