@@ -1,4 +1,5 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 import { Database } from '@/types/supabase';
 
@@ -49,16 +50,14 @@ export function createServiceRoleClient() {
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
     throw new Error('SUPABASE_SERVICE_ROLE_KEY is not set in environment variables.');
   }
-   return createBaseServerClient(process.env.SUPABASE_SERVICE_ROLE_KEY!, {
-    getAll: async () => {
-      const cookieStore = await cookies();
-      return cookieStore.getAll();
-    },
-     setAll: async (cookiesToSet: { name: string; value: string; options: CookieOptions }[]) => {
-        const cookieStore = await cookies();
-        cookiesToSet.forEach(({ name, value, options }) => {
-             cookieStore.set({ name, value, ...options });
-        });
+  return createClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+      },
     }
-  });
+  );
 }
