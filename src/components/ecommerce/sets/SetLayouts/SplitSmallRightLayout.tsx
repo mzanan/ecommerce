@@ -17,16 +17,16 @@ const SplitSmallRightLayout: React.FC<SplitSmallRightLayoutProps> = ({ set, isHo
   const imageUrl2 = sortedImages?.[1]?.image_url;
 
   return (
-    <div className='flex flex-col h-full gap-8 px-4 md:px-0 max-w-[1880px] mx-auto overflow-hidden'>
+    <div className='flex flex-col h-full gap-8 px-4 max-w-[1880px] mx-auto overflow-hidden'>
       {!isHomepageContext && <SetLayoutHeader set={set} isHomepageContext={isHomepageContext} />}
       
-      <div className="flex flex-col md:flex-row gap-8 flex-grow min-h-0">
+      <div className="grid grid-cols-1 md:grid-cols-[5fr_4fr] gap-8 flex-grow min-h-0 w-full md:max-w-[932px] mx-auto">
         <SetCard
           set={set}
           imageUrl={imageUrl1}
           altText={`${set.name ?? 'Set'} image 1`}
-          imageClassName='w-full md:max-w-[500px]'
-          containerClassName='flex flex-col items-center md:items-end md:justify-end'
+          imageClassName='w-full'
+          containerClassName='flex flex-col md:justify-end'
           animationDelay={0}
         />
       
@@ -34,8 +34,8 @@ const SplitSmallRightLayout: React.FC<SplitSmallRightLayoutProps> = ({ set, isHo
           set={set}
           imageUrl={imageUrl2}
           altText={`${set.name ?? 'Set'} image 2`}
-          imageClassName='w-full md:max-w-[400px]'
-          containerClassName='flex flex-col items-center md:items-start'
+          imageClassName='w-full'
+          containerClassName='flex flex-col'
           animationDelay={400}
         />
       </div>
